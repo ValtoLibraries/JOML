@@ -26,6 +26,7 @@ package org.joml;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 //#endif
+import java.util.*;
 
 /**
  * Interface to a read-only view of a 4-dimensional vector of double-precision floats.
@@ -66,7 +67,7 @@ public interface Vector4dc {
      * the absolute position as parameter.
      *
      * @param buffer
-     *          will receive the values of this vector in <tt>x, y, z, w</tt> order
+     *          will receive the values of this vector in <code>x, y, z, w</code> order
      * @return the passed in buffer
      * @see #get(int, ByteBuffer)
      */
@@ -81,7 +82,7 @@ public interface Vector4dc {
      * @param index 
      *          the absolute position into the ByteBuffer
      * @param buffer
-     *          will receive the values of this vector in <tt>x, y, z, w</tt> order
+     *          will receive the values of this vector in <code>x, y, z, w</code> order
      * @return the passed in buffer
      */
     ByteBuffer get(int index, ByteBuffer buffer);
@@ -97,7 +98,7 @@ public interface Vector4dc {
      * the absolute position as parameter.
      *
      * @param buffer
-     *          will receive the values of this vector in <tt>x, y, z, w</tt> order
+     *          will receive the values of this vector in <code>x, y, z, w</code> order
      * @return the passed in buffer
      * @see #get(int, DoubleBuffer)
      */
@@ -112,7 +113,7 @@ public interface Vector4dc {
      * @param index
      *          the absolute position into the DoubleBuffer
      * @param buffer
-     *          will receive the values of this vector in <tt>x, y, z, w</tt> order
+     *          will receive the values of this vector in <code>x, y, z, w</code> order
      * @return the passed in buffer
      */
     DoubleBuffer get(int index, DoubleBuffer buffer);
@@ -156,7 +157,7 @@ public interface Vector4dc {
     Vector4d sub(Vector4fc v, Vector4d dest);
 
     /**
-     * Subtract <tt>(x, y, z, w)</tt> from this and store the result in <code>dest</code>.
+     * Subtract <code>(x, y, z, w)</code> from this and store the result in <code>dest</code>.
      * 
      * @param x
      *          the x component to subtract
@@ -195,7 +196,7 @@ public interface Vector4dc {
     Vector4d add(Vector4fc v, Vector4d dest);
 
     /**
-     * Add <tt>(x, y, z, w)</tt> to this and store the result in <code>dest</code>.
+     * Add <code>(x, y, z, w)</code> to this and store the result in <code>dest</code>.
      * 
      * @param x
      *          the x component to subtract
@@ -454,7 +455,7 @@ public interface Vector4dc {
     Vector4d normalize(double length, Vector4d dest);
 
     /**
-     * Normalize this vector by computing only the norm of <tt>(x, y, z)</tt> and store the result in <code>dest</code>.
+     * Normalize this vector by computing only the norm of <code>(x, y, z)</code> and store the result in <code>dest</code>.
      * 
      * @param dest
      *          will hold the result
@@ -472,7 +473,7 @@ public interface Vector4dc {
     double distance(Vector4dc v);
 
     /**
-     * Return the distance between <code>this</code> vector and <tt>(x, y, z, w)</tt>.
+     * Return the distance between <code>this</code> vector and <code>(x, y, z, w)</code>.
      * 
      * @param x
      *          the x component of the other vector
@@ -496,7 +497,7 @@ public interface Vector4dc {
     double dot(Vector4dc v);
 
     /**
-     * Compute the dot product (inner product) of this vector and <tt>(x, y, z, w)</tt>.
+     * Compute the dot product (inner product) of this vector and <code>(x, y, z, w)</code>.
      * 
      * @param x
      *          the x component of the other vector
@@ -573,7 +574,7 @@ public interface Vector4dc {
      * @param v
      *          the other vector
      * @param t
-     *          the interpolation factor, within <tt>[0..1]</tt>
+     *          the interpolation factor, within <code>[0..1]</code>
      * @param dest
      *          will hold the result
      * @return dest
@@ -593,7 +594,7 @@ public interface Vector4dc {
      * @param t1
      *          the tangent of the other vector
      * @param t
-     *          the interpolation factor, within <tt>[0..1]</tt>
+     *          the interpolation factor, within <code>[0..1]</code>
      * @param dest
      *          will hold the result
      * @return dest
@@ -604,7 +605,7 @@ public interface Vector4dc {
      * Linearly interpolate <code>this</code> and <code>other</code> using the given interpolation factor <code>t</code>
      * and store the result in <code>dest</code>.
      * <p>
-     * If <code>t</code> is <tt>0.0</tt> then the result is <code>this</code>. If the interpolation factor is <code>1.0</code>
+     * If <code>t</code> is <code>0.0</code> then the result is <code>this</code>. If the interpolation factor is <code>1.0</code>
      * then the result is <code>other</code>.
      * 
      * @param other
@@ -621,10 +622,26 @@ public interface Vector4dc {
      * Get the value of the specified component of this vector.
      * 
      * @param component
-     *          the component, within <tt>[0..3]</tt>
+     *          the component, within <code>[0..3]</code>
      * @return the value
-     * @throws IllegalArgumentException if <code>component</code> is not within <tt>[0..3]</tt>
+     * @throws IllegalArgumentException if <code>component</code> is not within <code>[0..3]</code>
      */
     double get(int component) throws IllegalArgumentException;
+
+    /**
+     * Compare the vector components of <code>this</code> vector with the given vector using the given <code>delta</code>
+     * and return whether all of them are equal within a maximum difference of <code>delta</code>.
+     * <p>
+     * Please note that this method is not used by any data structure such as {@link ArrayList} {@link HashSet} or {@link HashMap}
+     * and their operations, such as {@link ArrayList#contains(Object)} or {@link HashSet#remove(Object)}, since those
+     * data structures only use the {@link Object#equals(Object)} and {@link Object#hashCode()} methods.
+     * 
+     * @param v
+     *          the other vector
+     * @param delta
+     *          the allowed maximum difference
+     * @return <code>true</code> whether all of the vector components are equal; <code>false</code> otherwise
+     */
+    boolean equals(Vector4dc v, double delta);
 
 }

@@ -34,8 +34,8 @@ import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import org.joml.internal.MemUtil;
-import org.joml.internal.Options;
+import org.joml.internal.*;
+import org.joml.internal.Runtime;
 
 /**
  * Contains the definition of a 3x3 matrix of doubles, and associated functions to transform
@@ -644,7 +644,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
     /**
      * Set this matrix to a rotation - and possibly scaling - equivalent to the given quaternion.
      * <p>
-     * This method is equivalent to calling: <tt>rotation(q)</tt>
+     * This method is equivalent to calling: <code>rotation(q)</code>
      * <p>
      * Reference: <a href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/">http://www.euclideanspace.com/</a>
      * 
@@ -661,7 +661,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
     /**
      * Set this matrix to a rotation - and possibly scaling - equivalent to the given quaternion.
      * <p>
-     * This method is equivalent to calling: <tt>rotation(q)</tt>
+     * This method is equivalent to calling: <code>rotation(q)</code>
      * <p>
      * Reference: <a href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/">http://www.euclideanspace.com/</a>
      * 
@@ -954,7 +954,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
     /**
      * Return a string representation of this matrix.
      * <p>
-     * This method creates a new {@link DecimalFormat} on every invocation with the format string "<tt>0.000E0;-</tt>".
+     * This method creates a new {@link DecimalFormat} on every invocation with the format string "<code>0.000E0;-</code>".
      * 
      * @return the string representation
      */
@@ -1367,7 +1367,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
     }
 
     /**
-     * Set this matrix to be a simple scale matrix which scales the base axes by <tt>xyz.x</tt>, <tt>xyz.y</tt> and <tt>xyz.z</tt> respectively.
+     * Set this matrix to be a simple scale matrix which scales the base axes by <code>xyz.x</code>, <code>xyz.y</code> and <code>xyz.z</code> respectively.
      * <p>
      * The resulting matrix can be multiplied against another transformation
      * matrix to obtain an additional scaling.
@@ -1402,8 +1402,8 @@ public class Matrix3d implements Externalizable, Matrix3dc {
     }
 
     /**
-     * Apply scaling to this matrix by scaling the base axes by the given <tt>xyz.x</tt>,
-     * <tt>xyz.y</tt> and <tt>xyz.z</tt> factors, respectively.
+     * Apply scaling to this matrix by scaling the base axes by the given <code>xyz.x</code>,
+     * <code>xyz.y</code> and <code>xyz.z</code> factors, respectively.
      * <p>
      * If <code>M</code> is <code>this</code> matrix and <code>S</code> the scaling matrix,
      * then the new matrix will be <code>M * S</code>. So when transforming a
@@ -1770,7 +1770,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * counter-clockwise around the rotation axis, when viewing along the negative axis direction towards the origin.
      * When used with a left-handed coordinate system, the rotation is clockwise.
      * <p>
-     * This method is equivalent to calling: <tt>rotationX(angleX).rotateY(angleY).rotateZ(angleZ)</tt>
+     * This method is equivalent to calling: <code>rotationX(angleX).rotateY(angleY).rotateZ(angleZ)</code>
      * 
      * @param angleX
      *            the angle to rotate about X
@@ -1821,7 +1821,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * counter-clockwise around the rotation axis, when viewing along the negative axis direction towards the origin.
      * When used with a left-handed coordinate system, the rotation is clockwise.
      * <p>
-     * This method is equivalent to calling: <tt>rotationZ(angleZ).rotateY(angleY).rotateX(angleX)</tt>
+     * This method is equivalent to calling: <code>rotationZ(angleZ).rotateY(angleY).rotateX(angleX)</code>
      * 
      * @param angleZ
      *            the angle to rotate about Z
@@ -1872,7 +1872,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * counter-clockwise around the rotation axis, when viewing along the negative axis direction towards the origin.
      * When used with a left-handed coordinate system, the rotation is clockwise.
      * <p>
-     * This method is equivalent to calling: <tt>rotationY(angleY).rotateX(angleX).rotateZ(angleZ)</tt>
+     * This method is equivalent to calling: <code>rotationY(angleY).rotateX(angleX).rotateZ(angleZ)</code>
      * 
      * @param angleY
      *            the angle to rotate about Y
@@ -2264,7 +2264,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * vector <code>v</code> with the new matrix by using <code>M * R * v</code>, the
      * rotation will be applied first!
      * <p>
-     * This method is equivalent to calling: <tt>rotateX(angleX).rotateY(angleY).rotateZ(angleZ)</tt>
+     * This method is equivalent to calling: <code>rotateX(angleX).rotateY(angleY).rotateZ(angleZ)</code>
      * 
      * @param angleX
      *            the angle to rotate about X
@@ -2329,7 +2329,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * vector <code>v</code> with the new matrix by using <code>M * R * v</code>, the
      * rotation will be applied first!
      * <p>
-     * This method is equivalent to calling: <tt>rotateZ(angleZ).rotateY(angleY).rotateX(angleX)</tt>
+     * This method is equivalent to calling: <code>rotateZ(angleZ).rotateY(angleY).rotateX(angleX)</code>
      * 
      * @param angleZ
      *            the angle to rotate about Z
@@ -2394,7 +2394,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * vector <code>v</code> with the new matrix by using <code>M * R * v</code>, the
      * rotation will be applied first!
      * <p>
-     * This method is equivalent to calling: <tt>rotateY(angles.y).rotateX(angles.x).rotateZ(angles.z)</tt>
+     * This method is equivalent to calling: <code>rotateY(angles.y).rotateX(angles.x).rotateZ(angles.z)</code>
      * 
      * @param angles
      *            the Euler angles
@@ -2417,7 +2417,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * vector <code>v</code> with the new matrix by using <code>M * R * v</code>, the
      * rotation will be applied first!
      * <p>
-     * This method is equivalent to calling: <tt>rotateY(angleY).rotateX(angleX).rotateZ(angleZ)</tt>
+     * This method is equivalent to calling: <code>rotateY(angleY).rotateX(angleX).rotateZ(angleZ)</code>
      * 
      * @param angleY
      *            the angle to rotate about Y
@@ -2547,7 +2547,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
 
     /**
      * Pre-multiply a rotation to this matrix by rotating the given amount of radians
-     * about the specified <tt>(x, y, z)</tt> axis and store the result in <code>dest</code>.
+     * about the specified <code>(x, y, z)</code> axis and store the result in <code>dest</code>.
      * <p>
      * The axis described by the three components needs to be a unit vector.
      * <p>
@@ -2618,7 +2618,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
 
     /**
      * Pre-multiply a rotation to this matrix by rotating the given amount of radians
-     * about the specified <tt>(x, y, z)</tt> axis.
+     * about the specified <code>(x, y, z)</code> axis.
      * <p>
      * The axis described by the three components needs to be a unit vector.
      * <p>
@@ -3522,11 +3522,11 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * Set the row at the given <code>row</code> index, starting with <code>0</code>.
      * 
      * @param row
-     *          the row index in <tt>[0..2]</tt>
+     *          the row index in <code>[0..2]</code>
      * @param src
      *          the row components to set
      * @return this
-     * @throws IndexOutOfBoundsException if <code>row</code> is not in <tt>[0..2]</tt>
+     * @throws IndexOutOfBoundsException if <code>row</code> is not in <code>[0..2]</code>
      */
     public Matrix3d setRow(int row, Vector3dc src) throws IndexOutOfBoundsException {
         return setRow(row, src.x(), src.y(), src.z());
@@ -3536,7 +3536,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * Set the row at the given <code>row</code> index, starting with <code>0</code>.
      * 
      * @param row
-     *          the column index in <tt>[0..2]</tt>
+     *          the column index in <code>[0..2]</code>
      * @param x
      *          the first element in the row
      * @param y
@@ -3544,7 +3544,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * @param z
      *          the third element in the row
      * @return this
-     * @throws IndexOutOfBoundsException if <code>row</code> is not in <tt>[0..2]</tt>
+     * @throws IndexOutOfBoundsException if <code>row</code> is not in <code>[0..2]</code>
      */
     public Matrix3d setRow(int row, double x, double y, double z) throws IndexOutOfBoundsException {
         switch (row) {
@@ -3599,11 +3599,11 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * Set the column at the given <code>column</code> index, starting with <code>0</code>.
      * 
      * @param column
-     *          the column index in <tt>[0..2]</tt>
+     *          the column index in <code>[0..2]</code>
      * @param src
      *          the column components to set
      * @return this
-     * @throws IndexOutOfBoundsException if <code>column</code> is not in <tt>[0..2]</tt>
+     * @throws IndexOutOfBoundsException if <code>column</code> is not in <code>[0..2]</code>
      */
     public Matrix3d setColumn(int column, Vector3dc src) throws IndexOutOfBoundsException {
         return setColumn(column, src.x(), src.y(), src.z());
@@ -3613,7 +3613,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * Set the column at the given <code>column</code> index, starting with <code>0</code>.
      * 
      * @param column
-     *          the column index in <tt>[0..2]</tt>
+     *          the column index in <code>[0..2]</code>
      * @param x
      *          the first element in the column
      * @param y
@@ -3621,7 +3621,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * @param z
      *          the third element in the column
      * @return this
-     * @throws IndexOutOfBoundsException if <code>column</code> is not in <tt>[0..2]</tt>
+     * @throws IndexOutOfBoundsException if <code>column</code> is not in <code>[0..2]</code>
      */
     public Matrix3d setColumn(int column, double x, double y, double z) throws IndexOutOfBoundsException {
         switch (column) {
@@ -3698,9 +3698,9 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * Set the matrix element at the given column and row to the specified value.
      * 
      * @param column
-     *          the colum index in <tt>[0..2]</tt>
+     *          the colum index in <code>[0..2]</code>
      * @param row
-     *          the row index in <tt>[0..2]</tt>
+     *          the row index in <code>[0..2]</code>
      * @param value
      *          the value
      * @return this
@@ -4188,6 +4188,34 @@ public class Matrix3d implements Externalizable, Matrix3dc {
         return true;
     }
 
+    public boolean equals(Matrix3dc m, double delta) {
+        if (this == m)
+            return true;
+        if (m == null)
+            return false;
+        if (!(m instanceof Matrix3d))
+            return false;
+        if (!Runtime.equals(m00, m.m00(), delta))
+            return false;
+        if (!Runtime.equals(m01, m.m01(), delta))
+            return false;
+        if (!Runtime.equals(m02, m.m02(), delta))
+            return false;
+        if (!Runtime.equals(m10, m.m10(), delta))
+            return false;
+        if (!Runtime.equals(m11, m.m11(), delta))
+            return false;
+        if (!Runtime.equals(m12, m.m12(), delta))
+            return false;
+        if (!Runtime.equals(m20, m.m20(), delta))
+            return false;
+        if (!Runtime.equals(m21, m.m21(), delta))
+            return false;
+        if (!Runtime.equals(m22, m.m22(), delta))
+            return false;
+        return true;
+    }
+
     /**
      * Exchange the values of <code>this</code> matrix with the given <code>other</code> matrix.
      * 
@@ -4323,7 +4351,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * Linearly interpolate <code>this</code> and <code>other</code> using the given interpolation factor <code>t</code>
      * and store the result in <code>this</code>.
      * <p>
-     * If <code>t</code> is <tt>0.0</tt> then the result is <code>this</code>. If the interpolation factor is <code>1.0</code>
+     * If <code>t</code> is <code>0.0</code> then the result is <code>this</code>. If the interpolation factor is <code>1.0</code>
      * then the result is <code>other</code>.
      *
      * @param other
@@ -4365,7 +4393,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * In order to set the matrix to a rotation transformation without post-multiplying it,
      * use {@link #rotationTowards(Vector3dc, Vector3dc) rotationTowards()}.
      * <p>
-     * This method is equivalent to calling: <tt>mul(new Matrix3d().lookAlong(new Vector3d(dir).negate(), up).invert(), dest)</tt>
+     * This method is equivalent to calling: <code>mul(new Matrix3d().lookAlong(new Vector3d(dir).negate(), up).invert(), dest)</code>
      * 
      * @see #rotateTowards(double, double, double, double, double, double, Matrix3d)
      * @see #rotationTowards(Vector3dc, Vector3dc)
@@ -4394,7 +4422,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * In order to set the matrix to a rotation transformation without post-multiplying it,
      * use {@link #rotationTowards(Vector3dc, Vector3dc) rotationTowards()}.
      * <p>
-     * This method is equivalent to calling: <tt>mul(new Matrix3d().lookAlong(new Vector3d(dir).negate(), up).invert())</tt>
+     * This method is equivalent to calling: <code>mul(new Matrix3d().lookAlong(new Vector3d(dir).negate(), up).invert())</code>
      * 
      * @see #rotateTowards(double, double, double, double, double, double)
      * @see #rotationTowards(Vector3dc, Vector3dc)
@@ -4421,7 +4449,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * In order to set the matrix to a rotation transformation without post-multiplying it,
      * use {@link #rotationTowards(double, double, double, double, double, double) rotationTowards()}.
      * <p>
-     * This method is equivalent to calling: <tt>mul(new Matrix3d().lookAlong(-dirX, -dirY, -dirZ, upX, upY, upZ).invert())</tt>
+     * This method is equivalent to calling: <code>mul(new Matrix3d().lookAlong(-dirX, -dirY, -dirZ, upX, upY, upZ).invert())</code>
      * 
      * @see #rotateTowards(Vector3dc, Vector3dc)
      * @see #rotationTowards(double, double, double, double, double, double)
@@ -4457,7 +4485,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * In order to set the matrix to a rotation transformation without post-multiplying it,
      * use {@link #rotationTowards(double, double, double, double, double, double) rotationTowards()}.
      * <p>
-     * This method is equivalent to calling: <tt>mul(new Matrix3d().lookAlong(-dirX, -dirY, -dirZ, upX, upY, upZ).invert(), dest)</tt>
+     * This method is equivalent to calling: <code>mul(new Matrix3d().lookAlong(-dirX, -dirY, -dirZ, upX, upY, upZ).invert(), dest)</code>
      * 
      * @see #rotateTowards(Vector3dc, Vector3dc)
      * @see #rotationTowards(double, double, double, double, double, double)
@@ -4532,7 +4560,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * In order to apply the rotation transformation to a previous existing transformation,
      * use {@link #rotateTowards(double, double, double, double, double, double) rotateTowards}.
      * <p>
-     * This method is equivalent to calling: <tt>setLookAlong(new Vector3d(dir).negate(), up).invert()</tt>
+     * This method is equivalent to calling: <code>setLookAlong(new Vector3d(dir).negate(), up).invert()</code>
      * 
      * @see #rotationTowards(Vector3dc, Vector3dc)
      * @see #rotateTowards(double, double, double, double, double, double)
@@ -4554,7 +4582,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * In order to apply the rotation transformation to a previous existing transformation,
      * use {@link #rotateTowards(double, double, double, double, double, double) rotateTowards}.
      * <p>
-     * This method is equivalent to calling: <tt>setLookAlong(-dirX, -dirY, -dirZ, upX, upY, upZ).invert()</tt>
+     * This method is equivalent to calling: <code>setLookAlong(-dirX, -dirY, -dirZ, upX, upY, upZ).invert()</code>
      * 
      * @see #rotateTowards(Vector3dc, Vector3dc)
      * @see #rotationTowards(double, double, double, double, double, double)
@@ -4610,10 +4638,10 @@ public class Matrix3d implements Externalizable, Matrix3dc {
      * <p>
      * This method assumes that <code>this</code> matrix only represents a rotation without scaling.
      * <p>
-     * Note that the returned Euler angles must be applied in the order <tt>Z * Y * X</tt> to obtain the identical matrix.
+     * Note that the returned Euler angles must be applied in the order <code>Z * Y * X</code> to obtain the identical matrix.
      * This means that calling {@link Matrix3d#rotateZYX(double, double, double)} using the obtained Euler angles will yield
      * the same rotation as the original matrix from which the Euler angles were obtained, so in the below code the matrix
-     * <tt>m2</tt> should be identical to <tt>m</tt> (disregarding possible floating-point inaccuracies).
+     * <code>m2</code> should be identical to <code>m</code> (disregarding possible floating-point inaccuracies).
      * <pre>
      * Matrix3d m = ...; // &lt;- matrix only representing rotation
      * Matrix3d n = new Matrix3d();
@@ -4630,6 +4658,84 @@ public class Matrix3d implements Externalizable, Matrix3dc {
         dest.x = (float) Math.atan2(m12, m22);
         dest.y = (float) Math.atan2(-m02, Math.sqrt(m12 * m12 + m22 * m22));
         dest.z = (float) Math.atan2(m01, m00);
+        return dest;
+    }
+
+    /**
+     * Apply an oblique projection transformation to this matrix with the given values for <code>a</code> and
+     * <code>b</code>.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>O</code> the oblique transformation matrix,
+     * then the new matrix will be <code>M * O</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * O * v</code>, the
+     * oblique transformation will be applied first!
+     * <p>
+     * The oblique transformation is defined as:
+     * <pre>
+     * x' = x + a*z
+     * y' = y + a*z
+     * z' = z
+     * </pre>
+     * or in matrix form:
+     * <pre>
+     * 1 0 a
+     * 0 1 b
+     * 0 0 1
+     * </pre>
+     * 
+     * @param a
+     *            the value for the z factor that applies to x
+     * @param b
+     *            the value for the z factor that applies to y
+     * @return this
+     */
+    public Matrix3d obliqueZ(double a, double b) {
+        this.m20 = m00 * a + m10 * b + m20;
+        this.m21 = m01 * a + m11 * b + m21;
+        this.m22 = m02 * a + m12 * b + m22;
+        return this;
+    }
+
+    /**
+     * Apply an oblique projection transformation to this matrix with the given values for <code>a</code> and
+     * <code>b</code> and store the result in <code>dest</code>.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>O</code> the oblique transformation matrix,
+     * then the new matrix will be <code>M * O</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * O * v</code>, the
+     * oblique transformation will be applied first!
+     * <p>
+     * The oblique transformation is defined as:
+     * <pre>
+     * x' = x + a*z
+     * y' = y + a*z
+     * z' = z
+     * </pre>
+     * or in matrix form:
+     * <pre>
+     * 1 0 a
+     * 0 1 b
+     * 0 0 1
+     * </pre>
+     * 
+     * @param a
+     *            the value for the z factor that applies to x
+     * @param b
+     *            the value for the z factor that applies to y
+     * @param dest
+     *            will hold the result
+     * @return dest
+     */
+    public Matrix3d obliqueZ(double a, double b, Matrix3d dest) {
+        dest.m00 = m00;
+        dest.m01 = m01;
+        dest.m02 = m02;
+        dest.m10 = m10;
+        dest.m11 = m11;
+        dest.m12 = m12;
+        dest.m20 = m00 * a + m10 * b + m20;
+        dest.m21 = m01 * a + m11 * b + m21;
+        dest.m22 = m02 * a + m12 * b + m22;
         return dest;
     }
 

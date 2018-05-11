@@ -26,6 +26,7 @@ package org.joml;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 //#endif
+import java.util.*;
 
 /**
  * Interface to a read-only view of a 3-dimensional vector of single-precision floats.
@@ -63,7 +64,7 @@ public interface Vector3fc {
      * @see #get(int, FloatBuffer)
      * 
      * @param buffer
-     *          will receive the values of this vector in <tt>x, y, z</tt> order
+     *          will receive the values of this vector in <code>x, y, z</code> order
      * @return the passed in buffer
      * @see #get(int, FloatBuffer)
      */
@@ -78,7 +79,7 @@ public interface Vector3fc {
      * @param index
      *          the absolute position into the FloatBuffer
      * @param buffer
-     *          will receive the values of this vector in <tt>x, y, z</tt> order
+     *          will receive the values of this vector in <code>x, y, z</code> order
      * @return the passed in buffer
      */
     FloatBuffer get(int index, FloatBuffer buffer);
@@ -96,7 +97,7 @@ public interface Vector3fc {
      * @see #get(int, ByteBuffer)
      * 
      * @param buffer
-     *          will receive the values of this vector in <tt>x, y, z</tt> order
+     *          will receive the values of this vector in <code>x, y, z</code> order
      * @return the passed in buffer
      * @see #get(int, ByteBuffer)
      */
@@ -111,7 +112,7 @@ public interface Vector3fc {
      * @param index
      *          the absolute position into the ByteBuffer
      * @param buffer
-     *          will receive the values of this vector in <tt>x, y, z</tt> order
+     *          will receive the values of this vector in <code>x, y, z</code> order
      * @return the passed in buffer
      */
     ByteBuffer get(int index, ByteBuffer buffer);
@@ -238,7 +239,7 @@ public interface Vector3fc {
      * Multiply the given matrix <code>mat</code> with this Vector3f, perform perspective division
      * and store the result in <code>dest</code>.
      * <p>
-     * This method uses <tt>w=1.0</tt> as the fourth vector component.
+     * This method uses <code>w=1.0</code> as the fourth vector component.
      * 
      * @param mat
      *          the matrix to multiply this vector by
@@ -272,7 +273,7 @@ public interface Vector3fc {
 
     /**
      * Multiply the given matrix <code>mat</code> with <code>this</code> by assuming a
-     * third row in the matrix of <tt>(0, 0, 1)</tt> and store the result in <code>dest</code>.
+     * third row in the matrix of <code>(0, 0, 1)</code> and store the result in <code>dest</code>.
      * 
      * @param mat
      *          the matrix to multiply this vector by
@@ -297,7 +298,7 @@ public interface Vector3fc {
      * Multiply the given 4x4 matrix <code>mat</code> with <code>this</code> and store the
      * result in <code>dest</code>.
      * <p>
-     * This method assumes the <tt>w</tt> component of <code>this</code> to be <tt>1.0</tt>.
+     * This method assumes the <code>w</code> component of <code>this</code> to be <code>1.0</code>.
      * 
      * @param mat
      *          the matrix to multiply this vector by
@@ -311,7 +312,7 @@ public interface Vector3fc {
      * Multiply the given 4x3 matrix <code>mat</code> with <code>this</code> and store the
      * result in <code>dest</code>.
      * <p>
-     * This method assumes the <tt>w</tt> component of <code>this</code> to be <tt>1.0</tt>.
+     * This method assumes the <code>w</code> component of <code>this</code> to be <code>1.0</code>.
      * 
      * @param mat
      *          the matrix to multiply this vector by
@@ -325,7 +326,7 @@ public interface Vector3fc {
      * Multiply the transpose of the given 4x4 matrix <code>mat</code> with <code>this</code> and store the
      * result in <code>dest</code>.
      * <p>
-     * This method assumes the <tt>w</tt> component of <code>this</code> to be <tt>1.0</tt>.
+     * This method assumes the <code>w</code> component of <code>this</code> to be <code>1.0</code>.
      * 
      * @param mat
      *          the matrix whose transpose to multiply this vector by
@@ -339,12 +340,12 @@ public interface Vector3fc {
      * Multiply the given 4x4 matrix <code>mat</code> with <code>this</code>, store the
      * result in <code>dest</code> and return the <i>w</i> component of the resulting 4D vector.
      * <p>
-     * This method assumes the <tt>w</tt> component of <code>this</code> to be <tt>1.0</tt>.
+     * This method assumes the <code>w</code> component of <code>this</code> to be <code>1.0</code>.
      * 
      * @param mat
      *          the matrix to multiply this vector by
      * @param dest
-     *          will hold the <tt>(x, y, z)</tt> components of the resulting vector
+     *          will hold the <code>(x, y, z)</code> components of the resulting vector
      * @return the <i>w</i> component of the resulting 4D vector after multiplication
      */
     float mulPositionW(Matrix4fc mat, Vector3f dest);
@@ -353,7 +354,7 @@ public interface Vector3fc {
      * Multiply the given 4x4 matrix <code>mat</code> with <code>this</code> and store the
      * result in <code>dest</code>.
      * <p>
-     * This method assumes the <tt>w</tt> component of <code>this</code> to be <tt>0.0</tt>.
+     * This method assumes the <code>w</code> component of <code>this</code> to be <code>0.0</code>.
      * 
      * @param mat
      *          the matrix to multiply this vector by
@@ -367,7 +368,7 @@ public interface Vector3fc {
      * Multiply the given 4x4 matrix <code>mat</code> with <code>this</code> and store the
      * result in <code>dest</code>.
      * <p>
-     * This method assumes the <tt>w</tt> component of <code>this</code> to be <tt>0.0</tt>.
+     * This method assumes the <code>w</code> component of <code>this</code> to be <code>0.0</code>.
      * 
      * @param mat
      *          the matrix to multiply this vector by
@@ -381,7 +382,7 @@ public interface Vector3fc {
      * Multiply the given 4x3 matrix <code>mat</code> with <code>this</code> and store the
      * result in <code>dest</code>.
      * <p>
-     * This method assumes the <tt>w</tt> component of <code>this</code> to be <tt>0.0</tt>.
+     * This method assumes the <code>w</code> component of <code>this</code> to be <code>0.0</code>.
      * 
      * @param mat
      *          the matrix to multiply this vector by
@@ -395,7 +396,7 @@ public interface Vector3fc {
      * Multiply the transpose of the given 4x4 matrix <code>mat</code> with <code>this</code> and store the
      * result in <code>dest</code>.
      * <p>
-     * This method assumes the <tt>w</tt> component of <code>this</code> to be <tt>0.0</tt>.
+     * This method assumes the <code>w</code> component of <code>this</code> to be <code>0.0</code>.
      * 
      * @param mat
      *          the matrix whose transpose to multiply this vector by
@@ -489,7 +490,7 @@ public interface Vector3fc {
     Quaternionf rotationTo(Vector3fc toDir, Quaternionf dest);
 
     /**
-     * Compute the quaternion representing a rotation of <code>this</code> vector to point along <tt>(toDirX, toDirY, toDirZ)</tt>
+     * Compute the quaternion representing a rotation of <code>this</code> vector to point along <code>(toDirX, toDirY, toDirZ)</code>
      * and store the result in <code>dest</code>.
      * <p>
      * Because there can be multiple possible rotations, this method chooses the one with the shortest arc.
@@ -608,7 +609,7 @@ public interface Vector3fc {
     Vector3f cross(Vector3fc v, Vector3f dest);
 
     /**
-     * Compute the cross product of this vector and <tt>(x, y, z)</tt> and store the result in <code>dest</code>.
+     * Compute the cross product of this vector and <code>(x, y, z)</code> and store the result in <code>dest</code>.
      * 
      * @param x
      *          the x component of the other vector
@@ -632,7 +633,7 @@ public interface Vector3fc {
     float distance(Vector3fc v);
 
     /**
-     * Return the distance between <code>this</code> vector and <tt>(x, y, z)</tt>.
+     * Return the distance between <code>this</code> vector and <code>(x, y, z)</code>.
      * 
      * @param x
      *          the x component of the other vector
@@ -654,7 +655,7 @@ public interface Vector3fc {
     float distanceSquared(Vector3fc v);
 
     /**
-     * Return the square of the distance between <code>this</code> vector and <tt>(x, y, z)</tt>.
+     * Return the square of the distance between <code>this</code> vector and <code>(x, y, z)</code>.
      * 
      * @param x
      *          the x component of the other vector
@@ -676,7 +677,7 @@ public interface Vector3fc {
     float dot(Vector3fc v);
 
     /**
-     * Return the dot product of this vector and the vector <tt>(x, y, z)</tt>.
+     * Return the dot product of this vector and the vector <code>(x, y, z)</code>.
      * 
      * @param x
      *          the x component of the other vector
@@ -788,7 +789,7 @@ public interface Vector3fc {
     Vector3f half(Vector3fc other, Vector3f dest);
 
     /**
-     * Compute the half vector between this and the vector <tt>(x, y, z)</tt> 
+     * Compute the half vector between this and the vector <code>(x, y, z)</code> 
      * and store the result in <code>dest</code>.
      * 
      * @param x
@@ -811,7 +812,7 @@ public interface Vector3fc {
      * @param v
      *          the other vector
      * @param t
-     *          the interpolation factor, within <tt>[0..1]</tt>
+     *          the interpolation factor, within <code>[0..1]</code>
      * @param dest
      *          will hold the result
      * @return dest
@@ -831,7 +832,7 @@ public interface Vector3fc {
      * @param t1
      *          the tangent of the other vector
      * @param t
-     *          the interpolation factor, within <tt>[0..1]</tt>
+     *          the interpolation factor, within <code>[0..1]</code>
      * @param dest
      *          will hold the result
      * @return dest
@@ -842,7 +843,7 @@ public interface Vector3fc {
      * Linearly interpolate <code>this</code> and <code>other</code> using the given interpolation factor <code>t</code>
      * and store the result in <code>dest</code>.
      * <p>
-     * If <code>t</code> is <tt>0.0</tt> then the result is <code>this</code>. If the interpolation factor is <code>1.0</code>
+     * If <code>t</code> is <code>0.0</code> then the result is <code>this</code>. If the interpolation factor is <code>1.0</code>
      * then the result is <code>other</code>.
      * 
      * @param other
@@ -859,23 +860,23 @@ public interface Vector3fc {
      * Get the value of the specified component of this vector.
      * 
      * @param component
-     *          the component, within <tt>[0..2]</tt>
+     *          the component, within <code>[0..2]</code>
      * @return the value
-     * @throws IllegalArgumentException if <code>component</code> is not within <tt>[0..2]</tt>
+     * @throws IllegalArgumentException if <code>component</code> is not within <code>[0..2]</code>
      */
     float get(int component) throws IllegalArgumentException;
 
     /**
      * Determine the component with the biggest absolute value.
      * 
-     * @return the component index, within <tt>[0..2]</tt>
+     * @return the component index, within <code>[0..2]</code>
      */
     int maxComponent();
 
     /**
      * Determine the component with the smallest (towards zero) absolute value.
      * 
-     * @return the component index, within <tt>[0..2]</tt>
+     * @return the component index, within <code>[0..2]</code>
      */
     int minComponent();
 
@@ -906,5 +907,21 @@ public interface Vector3fc {
      * @return dest
      */
     Vector3f orthogonalizeUnit(Vector3fc v, Vector3f dest);
+
+    /**
+     * Compare the vector components of <code>this</code> vector with the given vector using the given <code>delta</code>
+     * and return whether all of them are equal within a maximum difference of <code>delta</code>.
+     * <p>
+     * Please note that this method is not used by any data structure such as {@link ArrayList} {@link HashSet} or {@link HashMap}
+     * and their operations, such as {@link ArrayList#contains(Object)} or {@link HashSet#remove(Object)}, since those
+     * data structures only use the {@link Object#equals(Object)} and {@link Object#hashCode()} methods.
+     * 
+     * @param v
+     *          the other vector
+     * @param delta
+     *          the allowed maximum difference
+     * @return <code>true</code> whether all of the vector components are equal; <code>false</code> otherwise
+     */
+    boolean equals(Vector3fc v, float delta);
 
 }
