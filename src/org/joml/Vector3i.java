@@ -582,7 +582,7 @@ public class Vector3i implements Externalizable, Vector3ic {
     public Vector3i mul(int scalar, Vector3i dest) {
         dest.x = x * scalar;
         dest.y = y * scalar;
-        dest.y = z * scalar;
+        dest.z = z * scalar;
         return dest;
     }
 
@@ -754,7 +754,7 @@ public class Vector3i implements Externalizable, Vector3ic {
         dest.x = x < v.x() ? x : v.x();
         dest.y = y < v.y() ? y : v.y();
         dest.z = z < v.z() ? z : v.z();
-        return this;
+        return dest;
     }
 
     /**
@@ -772,7 +772,7 @@ public class Vector3i implements Externalizable, Vector3ic {
         dest.x = x > v.x() ? x : v.x();
         dest.y = y > v.y() ? y : v.y();
         dest.z = z > v.z() ? z : v.z();
-        return this;
+        return dest;
     }
 
     public int hashCode() {

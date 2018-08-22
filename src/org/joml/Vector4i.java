@@ -669,18 +669,18 @@ public class Vector4i implements Externalizable, Vector4ic {
      *          the scalar to multiply by
      * @return a vector holding the result
      */
-    public Vector4i mul(float scalar) {
+    public Vector4i mul(int scalar) {
         return mul(scalar, thisOrNew());
     }
 
     /* (non-Javadoc)
-     * @see org.joml.Vector4ic#mul(float, org.joml.Vector4i)
+     * @see org.joml.Vector4ic#mul(int, org.joml.Vector4i)
      */
-    public Vector4i mul(float scalar, Vector4i dest) {
-        dest.x = (int) (x * scalar);
-        dest.y = (int) (y * scalar);
-        dest.z = (int) (z * scalar);
-        dest.w = (int) (w * scalar);
+    public Vector4i mul(int scalar, Vector4i dest) {
+        dest.x = x * scalar;
+        dest.y = y * scalar;
+        dest.z = z * scalar;
+        dest.w = w * scalar;
         return dest;
     }
 
@@ -842,7 +842,7 @@ public class Vector4i implements Externalizable, Vector4ic {
         dest.y = y < v.y() ? y : v.y();
         dest.z = z < v.z() ? z : v.z();
         dest.w = w < v.w() ? w : v.w();
-        return this;
+        return dest;
     }
 
     /**
@@ -861,7 +861,7 @@ public class Vector4i implements Externalizable, Vector4ic {
         dest.y = y > v.y() ? y : v.y();
         dest.z = z > v.z() ? z : v.z();
         dest.w = w > v.w() ? w : v.w();
-        return this;
+        return dest;
     }
 
     public int hashCode() {

@@ -23,7 +23,6 @@
 package org.joml.internal;
 
 //#ifndef __GWT__
-import java.io.IOException;
 import java.lang.reflect.Field;
 //#endif
 //#ifdef __HAS_NIO__
@@ -263,6 +262,11 @@ public abstract class MemUtil {
     public abstract void putColumn1(Matrix4f src, Vector4f dest);
     public abstract void putColumn2(Matrix4f src, Vector4f dest);
     public abstract void putColumn3(Matrix4f src, Vector4f dest);
+
+    public abstract void putColumn0(Matrix4f src, Vector3f dest);
+    public abstract void putColumn1(Matrix4f src, Vector3f dest);
+    public abstract void putColumn2(Matrix4f src, Vector3f dest);
+    public abstract void putColumn3(Matrix4f src, Vector3f dest);
 
     public abstract void getColumn0(Matrix4f dest, Vector4f src);
     public abstract void getColumn1(Matrix4f dest, Vector4f src);
@@ -2604,6 +2608,30 @@ public abstract class MemUtil {
             dest.w = src.m33();
         }
 
+        public void putColumn0(Matrix4f src, Vector3f dest) {
+            dest.x = src.m00();
+            dest.y = src.m01();
+            dest.z = src.m02();
+        }
+
+        public void putColumn1(Matrix4f src, Vector3f dest) {
+            dest.x = src.m10();
+            dest.y = src.m11();
+            dest.z = src.m12();
+        }
+
+        public void putColumn2(Matrix4f src, Vector3f dest) {
+            dest.x = src.m20();
+            dest.y = src.m21();
+            dest.z = src.m22();
+        }
+
+        public void putColumn3(Matrix4f src, Vector3f dest) {
+            dest.x = src.m30();
+            dest.y = src.m31();
+            dest.z = src.m32();
+        }
+
         public void getColumn0(Matrix4f dest, Vector4f src) {
             dest._m00(src.x);
             dest._m01(src.y);
@@ -2670,17 +2698,6 @@ public abstract class MemUtil {
         public static final long Quaternionf_x;
         public static final long floatArrayOffset;
 
-//#ifdef __HAS_NIO__
-        /**
-         * Used to create a direct ByteBuffer for a known address.
-         */
-        private static native ByteBuffer newTestBuffer();
-        /**
-         * Return the pointer size (4 = 32-bit, 8 = 64-bit).
-         */
-        private static native int getPointerSize();
-//#endif
-
         static {
             UNSAFE = getUnsafeInstance();
             try {
@@ -2713,49 +2730,12 @@ public abstract class MemUtil {
         }
 
 //#ifdef __HAS_NIO__
-        private static boolean atLeastJava9(String classVersion) {
-            try {
-                double value = Double.parseDouble(classVersion);
-                return value >= 53.0;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-
         private static long findBufferAddress() {
-            String javaVersion = System.getProperty("java.class.version");
-            if (atLeastJava9(javaVersion))
-                return findBufferAddressJDK9(null);
-            else
-                return findBufferAddressJDK1();
-        }
-        private static long findBufferAddressJDK1() {
             try {
                 return UNSAFE.objectFieldOffset(getDeclaredField(Buffer.class, "address")); //$NON-NLS-1$
             } catch (Exception e) {
-                /* Still try with shared library via address offset testing */
-                return findBufferAddressJDK9(e);
+                throw new UnsupportedOperationException(e);
             }
-        }
-        private static long findBufferAddressJDK9(Exception e) {
-            /* Maybe because of JDK9 AwkwardStrongEncapsulation. */
-            /* Try detecting the address from a known value. */
-            try {
-                SharedLibraryLoader.load();
-            } catch (IOException e1) {
-                throw new UnsupportedOperationException("Failed to load joml shared library", e1);
-            }
-            ByteBuffer bb = newTestBuffer();
-            long magicAddress = 0xFEEDBABEDEADBEEFL;
-            if (getPointerSize() == 4)
-                magicAddress &= 0xFFFFFFFFL;
-            long offset = 8L;
-            while (offset <= 32L) { // <- don't expect offset to be too large
-                if (UNSAFE.getLong(bb, offset) == magicAddress)
-                    return offset;
-                offset += 8L;
-            }
-            throw new UnsupportedOperationException("Could not detect ByteBuffer.address offset", e);
         }
 //#endif
 
@@ -2955,7 +2935,6 @@ public abstract class MemUtil {
             do {
                 try {
                     java.lang.reflect.Field field = type.getDeclaredField(fieldName);
-                    field.setAccessible(true);
                     return field;
                 } catch (NoSuchFieldException e) {
                     type = type.getSuperclass();
