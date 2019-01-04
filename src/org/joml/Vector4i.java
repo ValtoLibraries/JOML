@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import java.nio.IntBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.joml.Math;
 import org.joml.internal.MemUtil;
 import org.joml.internal.Options;
 import org.joml.internal.Runtime;
@@ -453,6 +454,42 @@ public class Vector4i implements Externalizable, Vector4ic {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.joml.Vector4ic#maxComponent()
+     */
+    public int maxComponent() {
+        int absX = Math.abs(x);
+        int absY = Math.abs(y);
+        int absZ = Math.abs(z);
+        int absW = Math.abs(w);
+        if (absX >= absY && absX >= absZ && absX >= absW) {
+            return 0;
+        } else if (absY >= absZ && absY >= absW) {
+            return 1;
+        } else if (absZ >= absW) {
+            return 2;
+        }
+        return 3;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4ic#minComponent()
+     */
+    public int minComponent() {
+        int absX = Math.abs(x);
+        int absY = Math.abs(y);
+        int absZ = Math.abs(z);
+        int absW = Math.abs(w);
+        if (absX < absY && absX < absZ && absX < absW) {
+            return 0;
+        } else if (absY < absZ && absY < absW) {
+            return 1;
+        } else if (absZ < absW) {
+            return 2;
+        }
+        return 3;
+    }
+
     /**
      * Set the value of the specified component of this vector.
      *
@@ -710,6 +747,20 @@ public class Vector4i implements Externalizable, Vector4ic {
      * @see org.joml.Vector4ic#lengthSquared()
      */
     public long lengthSquared() {
+        return lengthSquared(x, y, z, w);
+    }
+
+    /**
+     * Get the length squared of a 4-dimensional single-precision vector.
+     *
+     * @param x The vector's x component
+     * @param y The vector's y component
+     * @param z The vector's z component
+     * @param w The vector's w component
+     *
+     * @return the length squared of the given vector
+     */
+    public static long lengthSquared(int x, int y, int z, int w) {
         return x * x + y * y + z * z + w * w;
     }
 
@@ -720,8 +771,22 @@ public class Vector4i implements Externalizable, Vector4ic {
         return Math.sqrt(lengthSquared());
     }
 
+    /**
+     * Get the length of a 4-dimensional single-precision vector.
+     *
+     * @param x The vector's x component
+     * @param y The vector's y component
+     * @param z The vector's z component
+     * @param w The vector's w component
+     *
+     * @return the length squared of the given vector
+     */
+    public static double length(int x, int y, int z, int w) {
+        return Math.sqrt(lengthSquared(x, y, z, w));
+    }
+
     /* (non-Javadoc)
-     * @see org.joml.Vector4ic#distance(org.joml.Vector4i)
+     * @see org.joml.Vector4ic#distance(org.joml.Vector4ic)
      */
     public double distance(Vector4ic v) {
         return distance(v.x(), v.y(), v.z(), v.w());
@@ -732,6 +797,20 @@ public class Vector4i implements Externalizable, Vector4ic {
      */
     public double distance(int x, int y, int z, int w) {
         return Math.sqrt(distanceSquared(x, y, z, w));
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4ic#distanceSquared(org.joml.Vector4ic)
+     */
+    public long gridDistance(Vector4ic v) {
+        return Math.abs(v.x() - x()) + Math.abs(v.y() - y())  + Math.abs(v.z() - z())  + Math.abs(v.w() - w());
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4ic#distanceSquared(int, int, int, int)
+     */
+    public long gridDistance(int x, int y, int z, int w) {
+        return Math.abs(x - x()) + Math.abs(y - y()) + Math.abs(z - z()) + Math.abs(w - w());
     }
 
     /* (non-Javadoc)
@@ -749,6 +828,60 @@ public class Vector4i implements Externalizable, Vector4ic {
         int dy = this.y - y;
         int dz = this.z - z;
         int dw = this.w - w;
+        return dx * dx + dy * dy + dz * dz + dw * dw;
+    }
+
+    /**
+     * Return the distance between <code>(x1, y1, z1, w1)</code> and <code>(x2, y2, z2, w2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param w1
+     *          the w component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @param w2
+     *          the 2 component of the second vector
+     * @return the euclidean distance
+     */
+    public static double distance(int x1, int y1, int z1, int w1, int x2, int y2, int z2, int w2) {
+        return Math.sqrt(distanceSquared(x1, y1, z1, w1, x2, y2, z2, w2));
+    }
+
+    /**
+     * Return the squared distance between <code>(x1, y1, z1, w1)</code> and <code>(x2, y2, z2, w2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param w1
+     *          the w component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @param w2
+     *          the w component of the second vector
+     * @return the euclidean distance squared
+     */
+    public static long distanceSquared(int x1, int y1, int z1, int w1, int x2, int y2, int z2, int w2) {
+        int dx = x1 - x2;
+        int dy = y1 - y2;
+        int dz = z1 - z2;
+        int dw = w1 - w2;
         return dx * dx + dy * dy + dz * dz + dw * dw;
     }
 
@@ -900,4 +1033,18 @@ public class Vector4i implements Externalizable, Vector4ic {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.joml.Vector4ic#equals(int, int, int, int)
+     */
+    public boolean equals(int x, int y, int z, int w) {
+        if (this.x != x)
+            return false;
+        if (this.y != y)
+            return false;
+        if (this.z != z)
+            return false;
+        if (this.w != w)
+            return false;
+        return true;
+    }
 }

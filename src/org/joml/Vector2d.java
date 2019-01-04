@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import java.nio.DoubleBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.joml.Math;
 import org.joml.internal.MemUtil;
 import org.joml.internal.Options;
 import org.joml.internal.Runtime;
@@ -638,6 +639,27 @@ public class Vector2d implements Externalizable, Vector2dc {
     }
 
     /* (non-Javadoc)
+     * @see org.joml.Vector2dc#lengthSquared()
+     */
+    public double lengthSquared() {
+        return lengthSquared(x, y);
+    }
+
+    /**
+     * Get the length squared of a 2-dimensional double-precision vector.
+     *
+     * @param x The vector's x component
+     * @param y The vector's y component
+     *
+     * @return the length squared of the given vector
+     *
+     * @author F. Neurath
+     */
+    public static double lengthSquared(double x, double y) {
+        return x * x + y * y;
+    }
+
+    /* (non-Javadoc)
      * @see org.joml.Vector2dc#length()
      */
     public double length() {
@@ -646,7 +668,6 @@ public class Vector2d implements Externalizable, Vector2dc {
 
     /**
      * Get the length of a 2-dimensional double-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -656,29 +677,7 @@ public class Vector2d implements Externalizable, Vector2dc {
      * @author F. Neurath
      */
     public static double length(double x, double y) {
-        return Math.sqrt(x * x + y * y);
-    }
-
-    /* (non-Javadoc)
-     * @see org.joml.Vector2dc#lengthSqared()
-     */
-    public double lengthSquared() {
-        return x * x + y * y;
-    }
-
-    /**
-     * Get the length squared of a 2-dimensional double-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
-     *
-     * @param x The vector's x component
-     * @param y The vector's y component
-     *
-     * @return the length squared of the given vector
-     *
-     * @author F. Neurath
-     */
-    public static double lengthSqared(double x, double y) {
-        return x * x + y * y;
+        return Math.sqrt(lengthSquared(x, y));
     }
 
     /* (non-Javadoc)
@@ -689,6 +688,13 @@ public class Vector2d implements Externalizable, Vector2dc {
     }
 
     /* (non-Javadoc)
+     * @see org.joml.Vector2dc#distanceSquared(org.joml.Vector2dc)
+     */
+    public double distanceSquared(Vector2dc v) {
+        return distanceSquared(v.x(), v.y());
+    }
+
+    /* (non-Javadoc)
      * @see org.joml.Vector2dc#distance(org.joml.Vector2fc)
      */
     public double distance(Vector2fc v) {
@@ -696,12 +702,62 @@ public class Vector2d implements Externalizable, Vector2dc {
     }
 
     /* (non-Javadoc)
+     * @see org.joml.Vector2dc#distanceSquared(org.joml.Vector2fc)
+     */
+    public double distanceSquared(Vector2fc v) {
+        return distanceSquared(v.x(), v.y());
+    }
+
+    /* (non-Javadoc)
      * @see org.joml.Vector2dc#distance(double, double)
      */
     public double distance(double x, double y) {
+        return Math.sqrt(distanceSquared(x, y));
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2dc#distanceSquared(double, double)
+     */
+    public double distanceSquared(double x, double y) {
         double dx = this.x - x;
         double dy = this.y - y;
-        return Math.sqrt(dx * dx + dy * dy);
+        return dx * dx + dy * dy;
+    }
+
+    /**
+     * Return the distance between <code>(x1, y1)</code> and <code>(x2, y2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @return the euclidean distance
+     */
+    public static double distance(double x1, double y1, double x2, double y2) {
+        return Math.sqrt(distanceSquared(x1, y1, x2, y2));
+    }
+
+    /**
+     * Return the squared distance between <code>(x1, y1)</code> and <code>(x2, y2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @return the euclidean distance squared
+     */
+    public static double distanceSquared(double x1, double y1, double x2, double y2) {
+        double dx = x1 - x2;
+        double dy = y1 - y2;
+        return dx * dx + dy * dy;
     }
 
     /**
@@ -910,6 +966,17 @@ public class Vector2d implements Externalizable, Vector2dc {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.joml.Vector2dc#equals(double, double)
+     */
+    public boolean equals(double x, double y) {
+        if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(x))
+            return false;
+        if (Double.doubleToLongBits(this.y) != Double.doubleToLongBits(y))
+            return false;
+        return true;
+    }
+
     /**
      * Return a string representation of this vector.
      * <p>
@@ -1008,6 +1075,85 @@ public class Vector2d implements Externalizable, Vector2dc {
         dest.x = x > v.x() ? x : v.x();
         dest.y = y > v.y() ? y : v.y();
         return dest;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2dc#maxComponent()
+     */
+    public int maxComponent() {
+        double absX = Math.abs(x);
+        double absY = Math.abs(y);
+        if (absX >= absY)
+            return 0;
+        return 1;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2dc#minComponent()
+     */
+    public int minComponent() {
+        double absX = Math.abs(x);
+        double absY = Math.abs(y);
+        if (absX < absY)
+            return 0;
+        return 1;
+    }
+
+    /**
+     * Set each component of this vector to the largest (closest to positive
+     * infinity) {@code double} value that is less than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector2d floor() {
+        return floor(thisOrNew());
+    }
+
+    public Vector2d floor(Vector2d dest) {
+        dest.x = Math.floor(x);
+        dest.y = Math.floor(y);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the smallest (closest to negative
+     * infinity) {@code double} value that is greater than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector2d ceil() {
+        return ceil(thisOrNew());
+    }
+
+    public Vector2d ceil(Vector2d dest) {
+        dest.x = Math.ceil(x);
+        dest.y = Math.ceil(y);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the closest double that is equal to
+     * a mathematical integer, with ties rounding to positive infinity.
+     *
+     * @return a vector holding the result
+     */
+    public Vector2d round() {
+        return round(thisOrNew());
+    }
+
+    public Vector2d round(Vector2d dest) {
+        dest.x = Math.round(x);
+        dest.y = Math.round(y);
+        return dest;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2dc#isFinite()
+     */
+    public boolean isFinite() {
+        return Math.isFinite(x) && Math.isFinite(y);
     }
 
 }

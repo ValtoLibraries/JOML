@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 JOML
+ * (C) Copyright 2015-2019 JOML
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -258,6 +258,10 @@ public class Math {
         return java.lang.Math.abs(r);
     }
 
+    public static int abs(int r) {
+        return java.lang.Math.abs(r);
+    }
+
     public static int max(int x, int y) {
         return java.lang.Math.max(x, y);
     }
@@ -294,8 +298,35 @@ public class Math {
         return java.lang.Math.floor(v);
     }
 
+    public static float floor(float v) {
+        return (float) java.lang.Math.floor(v);
+    }
+
+    public static double ceil(double v) {
+        return java.lang.Math.ceil(v);
+    }
+
+    public static float ceil(float v) {
+        return (float) java.lang.Math.ceil(v);
+    }
+
+    public static long round(double v) {
+        return java.lang.Math.round(v);
+    }
+
+    public static int round(float v) {
+        return java.lang.Math.round(v);
+    }
+
     public static double exp(double a) {
     	return java.lang.Math.exp(a);
     }
 
+    public static boolean isFinite(double d) {
+        return abs(d) <= Double.MAX_VALUE;
+    }
+
+    public static boolean isFinite(float f) {
+        return abs(f) <= Float.MAX_VALUE;
+    }
 }

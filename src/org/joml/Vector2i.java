@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import java.nio.IntBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.joml.Math;
 import org.joml.internal.MemUtil;
 import org.joml.internal.Options;
 import org.joml.internal.Runtime;
@@ -468,6 +469,18 @@ public class Vector2i implements Externalizable, Vector2ic {
      * @see org.joml.Vector2ic#lengthSquared()
      */
     public long lengthSquared() {
+        return lengthSquared(x, y);
+    }
+
+    /**
+     * Get the length squared of a 2-dimensional single-precision vector.
+     *
+     * @param x The vector's x component
+     * @param y The vector's y component
+     *
+     * @return the length squared of the given vector
+     */
+    public static long lengthSquared(int x, int y) {
         return x * x + y * y;
     }
 
@@ -476,6 +489,18 @@ public class Vector2i implements Externalizable, Vector2ic {
      */
     public double length() {
         return Math.sqrt(lengthSquared());
+    }
+
+    /**
+     * Get the length of a 2-dimensional single-precision vector.
+     *
+     * @param x The vector's x component
+     * @param y The vector's y component
+     *
+     * @return the length squared of the given vector
+     */
+    public static double length(int x, int y) {
+        return Math.sqrt(lengthSquared(x, y));
     }
 
     /* (non-Javadoc)
@@ -507,6 +532,58 @@ public class Vector2i implements Externalizable, Vector2ic {
     public long distanceSquared(int x, int y) {
         int dx = this.x - x;
         int dy = this.y - y;
+        return dx * dx + dy * dy;
+    }
+
+    /**
+     * (non-Javadoc)
+     * @see org.joml.Vector2ic#gridDistance(org.joml.Vector2ic)
+     */
+    public long gridDistance(Vector2ic v) {
+        return Math.abs(v.x() - x()) + Math.abs(v.y() - y());
+    }
+
+    /**
+     * (non-Javadoc)
+     * @see org.joml.Vector2ic#gridDistance(int, int)
+     */
+    public long gridDistance(int x, int y) {
+        return Math.abs(x - x()) + Math.abs(y - y());
+    }
+
+    /**
+     * Return the distance between <code>(x1, y1)</code> and <code>(x2, y2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @return the euclidean distance
+     */
+    public static double distance(int x1, int y1, int x2, int y2) {
+        return Math.sqrt(distanceSquared(x1, y1, x2, y2));
+    }
+
+    /**
+     * Return the squared distance between <code>(x1, y1)</code> and <code>(x2, y2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @return the euclidean distance squared
+     */
+    public static long distanceSquared(int x1, int y1, int x2, int y2) {
+        int dx = x1 - x2;
+        int dy = y1 - y2;
         return dx * dx + dy * dy;
     }
     
@@ -686,6 +763,28 @@ public class Vector2i implements Externalizable, Vector2ic {
         return dest;
     }
 
+    /* (non-Javadoc)
+     * @see org.joml.Vector2ic#maxComponent()
+     */
+    public int maxComponent() {
+        int absX = Math.abs(x);
+        int absY = Math.abs(y);
+        if (absX >= absY)
+            return 0;
+        return 1;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2ic#minComponent()
+     */
+    public int minComponent() {
+        int absX = Math.abs(x);
+        int absY = Math.abs(y);
+        if (absX < absY)
+            return 0;
+        return 1;
+    }
+
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -711,6 +810,17 @@ public class Vector2i implements Externalizable, Vector2ic {
         if (y != other.y) {
             return false;
         }
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2ic#equals(int, int)
+     */
+    public boolean equals(int x, int y) {
+        if (this.x != x)
+            return false;
+        if (this.y != y)
+            return false;
         return true;
     }
 

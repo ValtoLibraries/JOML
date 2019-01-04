@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -1116,12 +1116,11 @@ public class Vector4f implements Externalizable, Vector4fc {
      * @see org.joml.Vector4fc#lengthSquared()
      */
     public float lengthSquared() {
-        return x * x + y * y + z * z + w * w;
+        return lengthSquared(x, y, z, w);
     }
 
     /**
      * Get the length squared of a 4-dimensional single-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -1132,6 +1131,10 @@ public class Vector4f implements Externalizable, Vector4fc {
      *
      * @author F. Neurath
      */
+    public static float lengthSquared(float x, float y, float z, float w) {
+        return x * x + y * y + z * z + w * w;
+    }
+
     public static float lengthSquared(int x, int y, int z, int w) {
         return x * x + y * y + z * z + w * w;
     }
@@ -1145,7 +1148,6 @@ public class Vector4f implements Externalizable, Vector4fc {
 
     /**
      * Get the length of a 4-dimensional single-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -1236,11 +1238,79 @@ public class Vector4f implements Externalizable, Vector4fc {
      * @see org.joml.Vector4fc#distance(float, float, float, float)
      */
     public float distance(float x, float y, float z, float w) {
+        return (float) Math.sqrt(distanceSquared(x, y, z, w));
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4fc#distanceSquared(org.joml.Vector4fc)
+     */
+    public float distanceSquared(Vector4fc v) {
+        return distanceSquared(v.x(), v.y(), v.z(), v.w());
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4fc#distanceSquared(float, float, float, float)
+     */
+    public float distanceSquared(float x, float y, float z, float w) {
         float dx = this.x - x;
         float dy = this.y - y;
         float dz = this.z - z;
         float dw = this.w - w;
-        return (float) Math.sqrt(dx * dx + dy * dy + dz * dz + dw * dw);
+        return dx * dx + dy * dy + dz * dz + dw * dw;
+    }
+
+    /**
+     * Return the distance between <code>(x1, y1, z1, w1)</code> and <code>(x2, y2, z2, w2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param w1
+     *          the w component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @param w2
+     *          the 2 component of the second vector
+     * @return the euclidean distance
+     */
+    public static float distance(float x1, float y1, float z1, float w1, float x2, float y2, float z2, float w2) {
+        return (float) Math.sqrt(distanceSquared(x1, y1, z1, w1, x2, y2, z2, w2));
+    }
+
+    /**
+     * Return the squared distance between <code>(x1, y1, z1, w1)</code> and <code>(x2, y2, z2, w2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param w1
+     *          the w component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @param w2
+     *          the w component of the second vector
+     * @return the euclidean distance squared
+     */
+    public static float distanceSquared(float x1, float y1, float z1, float w1, float x2, float y2, float z2, float w2) {
+        float dx = x1 - x2;
+        float dy = y1 - y2;
+        float dz = z1 - z2;
+        float dw = w1 - w2;
+        return dx * dx + dy * dy + dz * dz + dw * dw;
     }
 
     /* (non-Javadoc)
@@ -1261,10 +1331,10 @@ public class Vector4f implements Externalizable, Vector4fc {
      * @see org.joml.Vector4fc#angleCos(org.joml.Vector4fc)
      */
     public float angleCos(Vector4fc v) {
-        double length1Sqared = x * x + y * y + z * z + w * w;
-        double length2Sqared = v.x() * v.x() + v.y() * v.y() + v.z() * v.z() + v.w() * v.w();
+        double length1Squared = x * x + y * y + z * z + w * w;
+        double length2Squared = v.x() * v.x() + v.y() * v.y() + v.z() * v.z() + v.w() * v.w();
         double dot = x * v.x() + y * v.y() + z * v.z() + w * v.w();
-        return (float) (dot / (Math.sqrt(length1Sqared * length2Sqared)));
+        return (float) (dot / (Math.sqrt(length1Squared * length2Squared)));
     }
 
     /* (non-Javadoc)
@@ -1431,6 +1501,21 @@ public class Vector4f implements Externalizable, Vector4fc {
     }
 
     /* (non-Javadoc)
+     * @see org.joml.Vector4fc#equals(float, float, float, float)
+     */
+    public boolean equals(float x, float y, float z, float w) {
+        if (Float.floatToIntBits(this.x) != Float.floatToIntBits(x))
+            return false;
+        if (Float.floatToIntBits(this.y) != Float.floatToIntBits(y))
+            return false;
+        if (Float.floatToIntBits(this.z) != Float.floatToIntBits(z))
+            return false;
+        if (Float.floatToIntBits(this.w) != Float.floatToIntBits(w))
+            return false;
+        return true;
+    }
+
+    /* (non-Javadoc)
      * @see org.joml.Vector4fc#smoothStep(org.joml.Vector4fc, float, org.joml.Vector4f)
      */
     public Vector4f smoothStep(Vector4fc v, float t, Vector4f dest) {
@@ -1502,4 +1587,102 @@ public class Vector4f implements Externalizable, Vector4fc {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.joml.Vector4fc#maxComponent()
+     */
+    public int maxComponent() {
+        float absX = Math.abs(x);
+        float absY = Math.abs(y);
+        float absZ = Math.abs(z);
+        float absW = Math.abs(w);
+        if (absX >= absY && absX >= absZ && absX >= absW) {
+            return 0;
+        } else if (absY >= absZ && absY >= absW) {
+            return 1;
+        } else if (absZ >= absW) {
+            return 2;
+        }
+        return 3;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4fc#minComponent()
+     */
+    public int minComponent() {
+        float absX = Math.abs(x);
+        float absY = Math.abs(y);
+        float absZ = Math.abs(z);
+        float absW = Math.abs(w);
+        if (absX < absY && absX < absZ && absX < absW) {
+            return 0;
+        } else if (absY < absZ && absY < absW) {
+            return 1;
+        } else if (absZ < absW) {
+            return 2;
+        }
+        return 3;
+    }
+
+    /**
+     * Set each component of this vector to the largest (closest to positive
+     * infinity) {@code float} value that is less than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector4f floor() {
+        return floor(thisOrNew());
+    }
+
+    public Vector4f floor(Vector4f dest) {
+        dest.x = Math.floor(x);
+        dest.y = Math.floor(y);
+        dest.z = Math.floor(z);
+        dest.w = Math.floor(w);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the smallest (closest to negative
+     * infinity) {@code float} value that is greater than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector4f ceil() {
+        return ceil(thisOrNew());
+    }
+
+    public Vector4f ceil(Vector4f dest) {
+        dest.x = Math.ceil(x);
+        dest.y = Math.ceil(y);
+        dest.z = Math.ceil(z);
+        dest.w = Math.ceil(w);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the closest float that is equal to
+     * a mathematical integer, with ties rounding to positive infinity.
+     *
+     * @return a vector holding the result
+     */
+    public Vector4f round() {
+        return round(thisOrNew());
+    }
+
+    public Vector4f round(Vector4f dest) {
+        dest.x = Math.round(x);
+        dest.y = Math.round(y);
+        dest.z = Math.round(z);
+        dest.w = Math.round(w);
+        return dest;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4fc#isFinite()
+     */
+    public boolean isFinite() {
+        return Math.isFinite(x) && Math.isFinite(y) && Math.isFinite(z) && Math.isFinite(w);
+    }
 }

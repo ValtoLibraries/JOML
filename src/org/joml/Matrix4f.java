@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -3190,6 +3190,36 @@ public class Matrix4f implements Externalizable, Matrix4fc {
     }
 
     /* (non-Javadoc)
+     * @see org.joml.Matrix4fc#get4x3(java.nio.FloatBuffer)
+     */
+    public FloatBuffer get4x3(FloatBuffer buffer) {
+        return get4x3(buffer.position(), buffer);
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Matrix4fc#get4x3(int, java.nio.FloatBuffer)
+     */
+    public FloatBuffer get4x3(int index, FloatBuffer buffer) {
+        MemUtil.INSTANCE.put4x3(this, index, buffer);
+        return buffer;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Matrix4fc#get4x3(java.nio.ByteBuffer)
+     */
+    public ByteBuffer get4x3(ByteBuffer buffer) {
+        return get4x3(buffer.position(), buffer);
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Matrix4fc#get4x3(int, java.nio.ByteBuffer)
+     */
+    public ByteBuffer get4x3(int index, ByteBuffer buffer) {
+        MemUtil.INSTANCE.put4x3(this, index, buffer);
+        return buffer;
+    }
+
+    /* (non-Javadoc)
      * @see org.joml.Matrix4fc#getTransposed(java.nio.FloatBuffer)
      */
     public FloatBuffer getTransposed(FloatBuffer buffer) {
@@ -3441,22 +3471,17 @@ public class Matrix4f implements Externalizable, Matrix4fc {
         float cos = (float) Math.cosFromSin(sin, angle);
         float C = 1.0f - cos;
         float xy = x * y, xz = x * z, yz = y * z;
+        if ((properties & PROPERTY_IDENTITY) == 0)
+            MemUtil.INSTANCE.identity(this);
         this._m00(cos + x * x * C);
         this._m10(xy * C - z * sin);
         this._m20(xz * C + y * sin);
-        this._m30(0.0f);
         this._m01(xy * C + z * sin);
         this._m11(cos + y * y * C);
         this._m21(yz * C - x * sin);
-        this._m31(0.0f);
         this._m02(xz * C - y * sin);
         this._m12(yz * C + x * sin);
         this._m22(cos + z * z * C);
-        this._m32(0.0f);
-        this._m03(0.0f);
-        this._m13(0.0f);
-        this._m23(0.0f);
-        this._m33(1.0f);
         _properties(PROPERTY_AFFINE | PROPERTY_ORTHONORMAL);
         return this;
     }
@@ -3592,7 +3617,8 @@ public class Matrix4f implements Externalizable, Matrix4fc {
         float m_sinX = -sinX;
         float m_sinY = -sinY;
         float m_sinZ = -sinZ;
-
+        if ((properties & PROPERTY_IDENTITY) == 0)
+            MemUtil.INSTANCE.identity(this);
         // rotateX
         float nm11 = cosX;
         float nm12 = sinX;
@@ -3605,21 +3631,13 @@ public class Matrix4f implements Externalizable, Matrix4fc {
         this._m20(sinY);
         this._m21(nm21 * cosY);
         this._m22(nm22 * cosY);
-        this._m23(0.0f);
         // rotateZ
         this._m00(nm00 * cosZ);
         this._m01(nm01 * cosZ + nm11 * sinZ);
         this._m02(nm02 * cosZ + nm12 * sinZ);
-        this._m03(0.0f);
         this._m10(nm00 * m_sinZ);
         this._m11(nm01 * m_sinZ + nm11 * cosZ);
         this._m12(nm02 * m_sinZ + nm12 * cosZ);
-        this._m13(0.0f);
-        // set last column to identity
-        this._m30(0.0f);
-        this._m31(0.0f);
-        this._m32(0.0f);
-        this._m33(1.0f);
         _properties(PROPERTY_AFFINE | PROPERTY_ORTHONORMAL);
         return this;
     }
@@ -3920,22 +3938,22 @@ public class Matrix4f implements Externalizable, Matrix4fc {
         float x2 = quat.x() * quat.x();
         float y2 = quat.y() * quat.y();
         float z2 = quat.z() * quat.z();
-        float zw = quat.z() * quat.w();
-        float xy = quat.x() * quat.y();
-        float xz = quat.x() * quat.z();
-        float yw = quat.y() * quat.w();
-        float yz = quat.y() * quat.z();
-        float xw = quat.x() * quat.w();
+        float zw = quat.z() * quat.w(), dzw = zw + zw;
+        float xy = quat.x() * quat.y(), dxy = xy + xy;
+        float xz = quat.x() * quat.z(), dxz = xz + xz;
+        float yw = quat.y() * quat.w(), dyw = yw + yw;
+        float yz = quat.y() * quat.z(), dyz = yz + yz;
+        float xw = quat.x() * quat.w(), dxw = xw + xw;
         if ((properties & PROPERTY_IDENTITY) == 0)
             MemUtil.INSTANCE.identity(this);
         _m00(w2 + x2 - z2 - y2);
-        _m01(xy + zw + zw + xy);
-        _m02(xz - yw + xz - yw);
-        _m10(-zw + xy - zw + xy);
+        _m01(dxy + dzw);
+        _m02(dxz - dyw);
+        _m10(-dzw + dxy);
         _m11(y2 - z2 + w2 - x2);
-        _m12(yz + yz + xw + xw);
-        _m20(yw + xz + xz + yw);
-        _m21(yz + yz - xw - xw);
+        _m12(dyz + dxw);
+        _m20(dyw + dxz);
+        _m21(dyz - dxw);
         _m22(z2 - y2 - x2 + w2);
         _properties(PROPERTY_AFFINE | PROPERTY_ORTHONORMAL);
         return this;
@@ -9348,6 +9366,401 @@ public class Matrix4f implements Externalizable, Matrix4fc {
     }
 
     /**
+     * Apply a symmetric perspective projection frustum transformation for a right-handed coordinate system
+     * using the given NDC z range to this matrix and store the result in <code>dest</code>.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>P</code> the perspective projection matrix,
+     * then the new matrix will be <code>M * P</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * P * v</code>,
+     * the perspective projection will be applied first!
+     * <p>
+     * In order to set the matrix to a perspective frustum transformation without post-multiplying,
+     * use {@link #setPerspectiveRect(float, float, float, float, boolean) setPerspectiveRect}.
+     * 
+     * @see #setPerspectiveRect(float, float, float, float, boolean)
+     * 
+     * @param width
+     *            the width of the near frustum plane
+     * @param height
+     *            the height of the near frustum plane
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param dest
+     *            will hold the result
+     * @param zZeroToOne
+     *            whether to use Vulkan's and Direct3D's NDC z range of <code>[0..+1]</code> when <code>true</code>
+     *            or whether to use OpenGL's NDC z range of <code>[-1..+1]</code> when <code>false</code>
+     * @return dest
+     */
+    public Matrix4f perspectiveRect(float width, float height, float zNear, float zFar, boolean zZeroToOne, Matrix4f dest) {
+        if ((properties & PROPERTY_IDENTITY) != 0)
+            return dest.setPerspectiveRect(width, height, zNear, zFar, zZeroToOne);
+        return perspectiveRectGeneric(width, height, zNear, zFar, zZeroToOne, dest);
+    }
+    private Matrix4f perspectiveRectGeneric(float width, float height, float zNear, float zFar, boolean zZeroToOne, Matrix4f dest) {
+        float rm00 = (zNear + zNear) / width;
+        float rm11 = (zNear + zNear) / height;
+        float rm22, rm32;
+        boolean farInf = zFar > 0 && Float.isInfinite(zFar);
+        boolean nearInf = zNear > 0 && Float.isInfinite(zNear);
+        if (farInf) {
+            // See: "Infinite Projection Matrix" (http://www.terathon.com/gdc07_lengyel.pdf)
+            float e = 1E-6f;
+            rm22 = e - 1.0f;
+            rm32 = (e - (zZeroToOne ? 1.0f : 2.0f)) * zNear;
+        } else if (nearInf) {
+            float e = 1E-6f;
+            rm22 = (zZeroToOne ? 0.0f : 1.0f) - e;
+            rm32 = ((zZeroToOne ? 1.0f : 2.0f) - e) * zFar;
+        } else {
+            rm22 = (zZeroToOne ? zFar : zFar + zNear) / (zNear - zFar);
+            rm32 = (zZeroToOne ? zFar : zFar + zFar) * zNear / (zNear - zFar);
+        }
+        // perform optimized matrix multiplication
+        float nm20 = m20 * rm22 - m30;
+        float nm21 = m21 * rm22 - m31;
+        float nm22 = m22 * rm22 - m32;
+        float nm23 = m23 * rm22 - m33;
+        dest._m00(m00 * rm00);
+        dest._m01(m01 * rm00);
+        dest._m02(m02 * rm00);
+        dest._m03(m03 * rm00);
+        dest._m10(m10 * rm11);
+        dest._m11(m11 * rm11);
+        dest._m12(m12 * rm11);
+        dest._m13(m13 * rm11);
+        dest._m30(m20 * rm32);
+        dest._m31(m21 * rm32);
+        dest._m32(m22 * rm32);
+        dest._m33(m23 * rm32);
+        dest._m20(nm20);
+        dest._m21(nm21);
+        dest._m22(nm22);
+        dest._m23(nm23);
+        dest._properties(properties & ~(PROPERTY_AFFINE | PROPERTY_IDENTITY | PROPERTY_TRANSLATION | PROPERTY_ORTHONORMAL));
+        return dest;
+    }
+
+    /**
+     * Apply a symmetric perspective projection frustum transformation for a right-handed coordinate system
+     * using OpenGL's NDC z range of <code>[-1..+1]</code> to this matrix and store the result in <code>dest</code>.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>P</code> the perspective projection matrix,
+     * then the new matrix will be <code>M * P</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * P * v</code>,
+     * the perspective projection will be applied first!
+     * <p>
+     * In order to set the matrix to a perspective frustum transformation without post-multiplying,
+     * use {@link #setPerspectiveRect(float, float, float, float) setPerspectiveRect}.
+     * 
+     * @see #setPerspectiveRect(float, float, float, float)
+     * 
+     * @param width
+     *            the width of the near frustum plane
+     * @param height
+     *            the height of the near frustum plane
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param dest
+     *            will hold the result
+     * @return dest
+     */
+    public Matrix4f perspectiveRect(float width, float height, float zNear, float zFar, Matrix4f dest) {
+        return perspectiveRect(width, height, zNear, zFar, false, dest);
+    }
+
+    /**
+     * Apply a symmetric perspective projection frustum transformation using for a right-handed coordinate system
+     * the given NDC z range to this matrix.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>P</code> the perspective projection matrix,
+     * then the new matrix will be <code>M * P</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * P * v</code>,
+     * the perspective projection will be applied first!
+     * <p>
+     * In order to set the matrix to a perspective frustum transformation without post-multiplying,
+     * use {@link #setPerspectiveRect(float, float, float, float, boolean) setPerspectiveRect}.
+     * 
+     * @see #setPerspectiveRect(float, float, float, float, boolean)
+     * 
+     * @param width
+     *            the width of the near frustum plane
+     * @param height
+     *            the height of the near frustum plane
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zZeroToOne
+     *            whether to use Vulkan's and Direct3D's NDC z range of <code>[0..+1]</code> when <code>true</code>
+     *            or whether to use OpenGL's NDC z range of <code>[-1..+1]</code> when <code>false</code>
+     * @return a matrix holding the result
+     */
+    public Matrix4f perspectiveRect(float width, float height, float zNear, float zFar, boolean zZeroToOne) {
+        return perspectiveRect(width, height, zNear, zFar, zZeroToOne, thisOrNew());
+    }
+
+    /**
+     * Apply a symmetric perspective projection frustum transformation for a right-handed coordinate system
+     * using OpenGL's NDC z range of <code>[-1..+1]</code> to this matrix.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>P</code> the perspective projection matrix,
+     * then the new matrix will be <code>M * P</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * P * v</code>,
+     * the perspective projection will be applied first!
+     * <p>
+     * In order to set the matrix to a perspective frustum transformation without post-multiplying,
+     * use {@link #setPerspectiveRect(float, float, float, float) setPerspectiveRect}.
+     * 
+     * @see #setPerspectiveRect(float, float, float, float)
+     * 
+     * @param width
+     *            the width of the near frustum plane
+     * @param height
+     *            the height of the near frustum plane
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @return a matrix holding the result
+     */
+    public Matrix4f perspectiveRect(float width, float height, float zNear, float zFar) {
+        return perspectiveRect(width, height, zNear, zFar, thisOrNew());
+    }
+
+    /**
+     * Apply an asymmetric off-center perspective projection frustum transformation for a right-handed coordinate system
+     * using the given NDC z range to this matrix and store the result in <code>dest</code>.
+     * <p>
+     * The given angles <code>offAngleX</code> and <code>offAngleY</code> are the horizontal and vertical angles between
+     * the line of sight and the line given by the center of the near and far frustum planes. So, when <code>offAngleY</code>
+     * is just <code>fovy/2</code> then the projection frustum is rotated towards +Y and the bottom frustum plane 
+     * is parallel to the XZ-plane.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>P</code> the perspective projection matrix,
+     * then the new matrix will be <code>M * P</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * P * v</code>,
+     * the perspective projection will be applied first!
+     * <p>
+     * In order to set the matrix to a perspective frustum transformation without post-multiplying,
+     * use {@link #setPerspectiveOffCenter(float, float, float, float, float, float, boolean) setPerspectiveOffCenter}.
+     * 
+     * @see #setPerspectiveOffCenter(float, float, float, float, float, float, boolean)
+     * 
+     * @param fovy
+     *            the vertical field of view in radians (must be greater than zero and less than {@link Math#PI PI})
+     * @param offAngleX
+     *            the horizontal angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param offAngleY
+     *            the vertical angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param aspect
+     *            the aspect ratio (i.e. width / height; must be greater than zero)
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param dest
+     *            will hold the result
+     * @param zZeroToOne
+     *            whether to use Vulkan's and Direct3D's NDC z range of <code>[0..+1]</code> when <code>true</code>
+     *            or whether to use OpenGL's NDC z range of <code>[-1..+1]</code> when <code>false</code>
+     * @return dest
+     */
+    public Matrix4f perspectiveOffCenter(float fovy, float offAngleX, float offAngleY, float aspect, float zNear, float zFar, boolean zZeroToOne, Matrix4f dest) {
+        if ((properties & PROPERTY_IDENTITY) != 0)
+            return dest.setPerspectiveOffCenter(fovy, offAngleX, offAngleY, aspect, zNear, zFar, zZeroToOne);
+        return perspectiveOffCenterGeneric(fovy, offAngleX, offAngleY, aspect, zNear, zFar, zZeroToOne, dest);
+    }
+    private Matrix4f perspectiveOffCenterGeneric(float fovy, float offAngleX, float offAngleY, float aspect, float zNear, float zFar, boolean zZeroToOne, Matrix4f dest) {
+        float h = (float) Math.tan(fovy * 0.5f);
+        // calculate right matrix elements
+        float xScale = 1.0f / (h * aspect);
+        float yScale = 1.0f / h;
+        float rm00 = xScale;
+        float rm11 = yScale;
+        float offX = (float) Math.tan(offAngleX), offY = (float) Math.tan(offAngleY);
+        float rm20 = offX * xScale;
+        float rm21 = offY * yScale;
+        float rm22;
+        float rm32;
+        boolean farInf = zFar > 0 && Float.isInfinite(zFar);
+        boolean nearInf = zNear > 0 && Float.isInfinite(zNear);
+        if (farInf) {
+            // See: "Infinite Projection Matrix" (http://www.terathon.com/gdc07_lengyel.pdf)
+            float e = 1E-6f;
+            rm22 = e - 1.0f;
+            rm32 = (e - (zZeroToOne ? 1.0f : 2.0f)) * zNear;
+        } else if (nearInf) {
+            float e = 1E-6f;
+            rm22 = (zZeroToOne ? 0.0f : 1.0f) - e;
+            rm32 = ((zZeroToOne ? 1.0f : 2.0f) - e) * zFar;
+        } else {
+            rm22 = (zZeroToOne ? zFar : zFar + zNear) / (zNear - zFar);
+            rm32 = (zZeroToOne ? zFar : zFar + zFar) * zNear / (zNear - zFar);
+        }
+        // perform optimized matrix multiplication
+        float nm20 = m00 * rm20 + m10 * rm21 + m20 * rm22 - m30;
+        float nm21 = m01 * rm20 + m11 * rm21 + m21 * rm22 - m31;
+        float nm22 = m02 * rm20 + m12 * rm21 + m22 * rm22 - m32;
+        float nm23 = m03 * rm20 + m13 * rm21 + m23 * rm22 - m33;
+        dest._m00(m00 * rm00);
+        dest._m01(m01 * rm00);
+        dest._m02(m02 * rm00);
+        dest._m03(m03 * rm00);
+        dest._m10(m10 * rm11);
+        dest._m11(m11 * rm11);
+        dest._m12(m12 * rm11);
+        dest._m13(m13 * rm11);
+        dest._m30(m20 * rm32);
+        dest._m31(m21 * rm32);
+        dest._m32(m22 * rm32);
+        dest._m33(m23 * rm32);
+        dest._m20(nm20);
+        dest._m21(nm21);
+        dest._m22(nm22);
+        dest._m23(nm23);
+        dest._properties(properties & ~(PROPERTY_AFFINE | PROPERTY_IDENTITY | PROPERTY_TRANSLATION
+                | PROPERTY_ORTHONORMAL | (rm20 == 0.0f && rm21 == 0.0f ? 0 : PROPERTY_PERSPECTIVE)));
+        return dest;
+    }
+
+    /**
+     * Apply an asymmetric off-center perspective projection frustum transformation for a right-handed coordinate system
+     * using OpenGL's NDC z range of <code>[-1..+1]</code> to this matrix and store the result in <code>dest</code>.
+     * <p>
+     * The given angles <code>offAngleX</code> and <code>offAngleY</code> are the horizontal and vertical angles between
+     * the line of sight and the line given by the center of the near and far frustum planes. So, when <code>offAngleY</code>
+     * is just <code>fovy/2</code> then the projection frustum is rotated towards +Y and the bottom frustum plane 
+     * is parallel to the XZ-plane.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>P</code> the perspective projection matrix,
+     * then the new matrix will be <code>M * P</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * P * v</code>,
+     * the perspective projection will be applied first!
+     * <p>
+     * In order to set the matrix to a perspective frustum transformation without post-multiplying,
+     * use {@link #setPerspectiveOffCenter(float, float, float, float, float, float) setPerspectiveOffCenter}.
+     * 
+     * @see #setPerspectiveOffCenter(float, float, float, float, float, float)
+     * 
+     * @param fovy
+     *            the vertical field of view in radians (must be greater than zero and less than {@link Math#PI PI})
+     * @param offAngleX
+     *            the horizontal angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param offAngleY
+     *            the vertical angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param aspect
+     *            the aspect ratio (i.e. width / height; must be greater than zero)
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param dest
+     *            will hold the result
+     * @return dest
+     */
+    public Matrix4f perspectiveOffCenter(float fovy, float offAngleX, float offAngleY, float aspect, float zNear, float zFar, Matrix4f dest) {
+        return perspectiveOffCenter(fovy, offAngleX, offAngleY, aspect, zNear, zFar, false, dest);
+    }
+
+    /**
+     * Apply an asymmetric off-center perspective projection frustum transformation using for a right-handed coordinate system
+     * the given NDC z range to this matrix.
+     * <p>
+     * The given angles <code>offAngleX</code> and <code>offAngleY</code> are the horizontal and vertical angles between
+     * the line of sight and the line given by the center of the near and far frustum planes. So, when <code>offAngleY</code>
+     * is just <code>fovy/2</code> then the projection frustum is rotated towards +Y and the bottom frustum plane 
+     * is parallel to the XZ-plane.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>P</code> the perspective projection matrix,
+     * then the new matrix will be <code>M * P</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * P * v</code>,
+     * the perspective projection will be applied first!
+     * <p>
+     * In order to set the matrix to a perspective frustum transformation without post-multiplying,
+     * use {@link #setPerspectiveOffCenter(float, float, float, float, float, float, boolean) setPerspectiveOffCenter}.
+     * 
+     * @see #setPerspectiveOffCenter(float, float, float, float, float, float, boolean)
+     * 
+     * @param fovy
+     *            the vertical field of view in radians (must be greater than zero and less than {@link Math#PI PI})
+     * @param offAngleX
+     *            the horizontal angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param offAngleY
+     *            the vertical angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param aspect
+     *            the aspect ratio (i.e. width / height; must be greater than zero)
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zZeroToOne
+     *            whether to use Vulkan's and Direct3D's NDC z range of <code>[0..+1]</code> when <code>true</code>
+     *            or whether to use OpenGL's NDC z range of <code>[-1..+1]</code> when <code>false</code>
+     * @return a matrix holding the result
+     */
+    public Matrix4f perspectiveOffCenter(float fovy, float offAngleX, float offAngleY, float aspect, float zNear, float zFar, boolean zZeroToOne) {
+        return perspectiveOffCenter(fovy, offAngleX, offAngleY, aspect, zNear, zFar, zZeroToOne, thisOrNew());
+    }
+
+    /**
+     * Apply an asymmetric off-center perspective projection frustum transformation for a right-handed coordinate system
+     * using OpenGL's NDC z range of <code>[-1..+1]</code> to this matrix.
+     * <p>
+     * The given angles <code>offAngleX</code> and <code>offAngleY</code> are the horizontal and vertical angles between
+     * the line of sight and the line given by the center of the near and far frustum planes. So, when <code>offAngleY</code>
+     * is just <code>fovy/2</code> then the projection frustum is rotated towards +Y and the bottom frustum plane 
+     * is parallel to the XZ-plane.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>P</code> the perspective projection matrix,
+     * then the new matrix will be <code>M * P</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * P * v</code>,
+     * the perspective projection will be applied first!
+     * <p>
+     * In order to set the matrix to a perspective frustum transformation without post-multiplying,
+     * use {@link #setPerspectiveOffCenter(float, float, float, float, float, float) setPerspectiveOffCenter}.
+     * 
+     * @see #setPerspectiveOffCenter(float, float, float, float, float, float)
+     * 
+     * @param fovy
+     *            the vertical field of view in radians (must be greater than zero and less than {@link Math#PI PI})
+     * @param offAngleX
+     *            the horizontal angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param offAngleY
+     *            the vertical angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param aspect
+     *            the aspect ratio (i.e. width / height; must be greater than zero)
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @return a matrix holding the result
+     */
+    public Matrix4f perspectiveOffCenter(float fovy, float offAngleX, float offAngleY, float aspect, float zNear, float zFar) {
+        return perspectiveOffCenter(fovy, offAngleX, offAngleY, aspect, zNear, zFar, thisOrNew());
+    }
+
+    /**
      * Set this matrix to be a symmetric perspective projection frustum transformation for a right-handed coordinate system
      * using the given NDC z range.
      * <p>
@@ -9419,6 +9832,176 @@ public class Matrix4f implements Externalizable, Matrix4fc {
      */
     public Matrix4f setPerspective(float fovy, float aspect, float zNear, float zFar) {
         return setPerspective(fovy, aspect, zNear, zFar, false);
+    }
+
+    /**
+     * Set this matrix to be a symmetric perspective projection frustum transformation for a right-handed coordinate system
+     * using the given NDC z range.
+     * <p>
+     * In order to apply the perspective projection transformation to an existing transformation,
+     * use {@link #perspectiveRect(float, float, float, float, boolean) perspectiveRect()}.
+     * 
+     * @see #perspectiveRect(float, float, float, float, boolean)
+     * 
+     * @param width
+     *            the width of the near frustum plane
+     * @param height
+     *            the height of the near frustum plane
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zZeroToOne
+     *            whether to use Vulkan's and Direct3D's NDC z range of <code>[0..+1]</code> when <code>true</code>
+     *            or whether to use OpenGL's NDC z range of <code>[-1..+1]</code> when <code>false</code>
+     * @return this
+     */
+    public Matrix4f setPerspectiveRect(float width, float height, float zNear, float zFar, boolean zZeroToOne) {
+        MemUtil.INSTANCE.zero(this);
+        this._m00((zNear + zNear) / width);
+        this._m11((zNear + zNear) / height);
+        boolean farInf = zFar > 0 && Float.isInfinite(zFar);
+        boolean nearInf = zNear > 0 && Float.isInfinite(zNear);
+        if (farInf) {
+            // See: "Infinite Projection Matrix" (http://www.terathon.com/gdc07_lengyel.pdf)
+            float e = 1E-6f;
+            this._m22(e - 1.0f);
+            this._m32((e - (zZeroToOne ? 1.0f : 2.0f)) * zNear);
+        } else if (nearInf) {
+            float e = 1E-6f;
+            this._m22((zZeroToOne ? 0.0f : 1.0f) - e);
+            this._m32(((zZeroToOne ? 1.0f : 2.0f) - e) * zFar);
+        } else {
+            this._m22((zZeroToOne ? zFar : zFar + zNear) / (zNear - zFar));
+            this._m32((zZeroToOne ? zFar : zFar + zFar) * zNear / (zNear - zFar));
+        }
+        this._m23(-1.0f);
+        _properties(PROPERTY_PERSPECTIVE);
+        return this;
+    }
+
+    /**
+     * Set this matrix to be a symmetric perspective projection frustum transformation for a right-handed coordinate system
+     * using OpenGL's NDC z range of <code>[-1..+1]</code>.
+     * <p>
+     * In order to apply the perspective projection transformation to an existing transformation,
+     * use {@link #perspectiveRect(float, float, float, float) perspectiveRect()}.
+     * 
+     * @see #perspectiveRect(float, float, float, float)
+     * 
+     * @param width
+     *            the width of the near frustum plane
+     * @param height
+     *            the height of the near frustum plane
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @return this
+     */
+    public Matrix4f setPerspectiveRect(float width, float height, float zNear, float zFar) {
+        return setPerspectiveRect(width, height, zNear, zFar, false);
+    }
+
+    /**
+     * Set this matrix to be an asymmetric off-center perspective projection frustum transformation for a right-handed
+     * coordinate system using OpenGL's NDC z range of <code>[-1..+1]</code>.
+     * <p>
+     * The given angles <code>offAngleX</code> and <code>offAngleY</code> are the horizontal and vertical angles between
+     * the line of sight and the line given by the center of the near and far frustum planes. So, when <code>offAngleY</code>
+     * is just <code>fovy/2</code> then the projection frustum is rotated towards +Y and the bottom frustum plane 
+     * is parallel to the XZ-plane.
+     * <p>
+     * In order to apply the perspective projection transformation to an existing transformation,
+     * use {@link #perspectiveOffCenter(float, float, float, float, float, float) perspectiveOffCenter()}.
+     * 
+     * @see #perspectiveOffCenter(float, float, float, float, float, float)
+     * 
+     * @param fovy
+     *            the vertical field of view in radians (must be greater than zero and less than {@link Math#PI PI})
+     * @param offAngleX
+     *            the horizontal angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param offAngleY
+     *            the vertical angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param aspect
+     *            the aspect ratio (i.e. width / height; must be greater than zero)
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @return this
+     */
+    public Matrix4f setPerspectiveOffCenter(float fovy, float offAngleX, float offAngleY,
+            float aspect, float zNear, float zFar) {
+        return setPerspectiveOffCenter(fovy, offAngleX, offAngleY, aspect, zNear, zFar, false);
+    }
+    /**
+     * Set this matrix to be an asymmetric off-center perspective projection frustum transformation for a right-handed
+     * coordinate system using the given NDC z range.
+     * <p>
+     * The given angles <code>offAngleX</code> and <code>offAngleY</code> are the horizontal and vertical angles between
+     * the line of sight and the line given by the center of the near and far frustum planes. So, when <code>offAngleY</code>
+     * is just <code>fovy/2</code> then the projection frustum is rotated towards +Y and the bottom frustum plane 
+     * is parallel to the XZ-plane.
+     * <p>
+     * In order to apply the perspective projection transformation to an existing transformation,
+     * use {@link #perspectiveOffCenter(float, float, float, float, float, float) perspectiveOffCenter()}.
+     * 
+     * @see #perspectiveOffCenter(float, float, float, float, float, float)
+     * 
+     * @param fovy
+     *            the vertical field of view in radians (must be greater than zero and less than {@link Math#PI PI})
+     * @param offAngleX
+     *            the horizontal angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param offAngleY
+     *            the vertical angle between the line of sight and the line crossing the center of the near and far frustum planes
+     * @param aspect
+     *            the aspect ratio (i.e. width / height; must be greater than zero)
+     * @param zNear
+     *            near clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the near clipping plane will be at positive infinity.
+     *            In that case, <code>zFar</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zFar
+     *            far clipping plane distance. If the special value {@link Float#POSITIVE_INFINITY} is used, the far clipping plane will be at positive infinity.
+     *            In that case, <code>zNear</code> may not also be {@link Float#POSITIVE_INFINITY}.
+     * @param zZeroToOne
+     *            whether to use Vulkan's and Direct3D's NDC z range of <code>[0..+1]</code> when <code>true</code>
+     *            or whether to use OpenGL's NDC z range of <code>[-1..+1]</code> when <code>false</code>
+     * @return this
+     */
+    public Matrix4f setPerspectiveOffCenter(float fovy, float offAngleX, float offAngleY,
+                                            float aspect, float zNear, float zFar, boolean zZeroToOne) {
+        MemUtil.INSTANCE.zero(this);
+        float h = (float) Math.tan(fovy * 0.5f);
+        float xScale = 1.0f / (h * aspect), yScale = 1.0f / h;
+        this._m00(xScale);
+        this._m11(yScale);
+        float offX = (float) Math.tan(offAngleX), offY = (float) Math.tan(offAngleY);
+        this._m20(offX * xScale);
+        this._m21(offY * yScale);
+        boolean farInf = zFar > 0 && Float.isInfinite(zFar);
+        boolean nearInf = zNear > 0 && Float.isInfinite(zNear);
+        if (farInf) {
+            // See: "Infinite Projection Matrix" (http://www.terathon.com/gdc07_lengyel.pdf)
+            float e = 1E-6f;
+            this._m22(e - 1.0f);
+            this._m32((e - (zZeroToOne ? 1.0f : 2.0f)) * zNear);
+        } else if (nearInf) {
+            float e = 1E-6f;
+            this._m22((zZeroToOne ? 0.0f : 1.0f) - e);
+            this._m32(((zZeroToOne ? 1.0f : 2.0f) - e) * zFar);
+        } else {
+            this._m22((zZeroToOne ? zFar : zFar + zNear) / (zNear - zFar));
+            this._m32((zZeroToOne ? zFar : zFar + zFar) * zNear / (zNear - zFar));
+        }
+        this._m23(-1.0f);
+        _properties(offAngleX == 0.0f && offAngleY == 0.0f ? PROPERTY_PERSPECTIVE : 0);
+        return this;
     }
 
     /**
@@ -10353,24 +10936,19 @@ public class Matrix4f implements Externalizable, Matrix4fc {
         return rotateGeneric(quat, dest);
     }
     private Matrix4f rotateGeneric(Quaternionfc quat, Matrix4f dest) {
-        float w2 = quat.w() * quat.w();
-        float x2 = quat.x() * quat.x();
-        float y2 = quat.y() * quat.y();
-        float z2 = quat.z() * quat.z();
-        float zw = quat.z() * quat.w();
-        float xy = quat.x() * quat.y();
-        float xz = quat.x() * quat.z();
-        float yw = quat.y() * quat.w();
-        float yz = quat.y() * quat.z();
-        float xw = quat.x() * quat.w();
+        float w2 = quat.w() * quat.w(), x2 = quat.x() * quat.x();
+        float y2 = quat.y() * quat.y(), z2 = quat.z() * quat.z();
+        float zw = quat.z() * quat.w(), dzw = zw + zw, xy = quat.x() * quat.y(), dxy = xy + xy;
+        float xz = quat.x() * quat.z(), dxz = xz + xz, yw = quat.y() * quat.w(), dyw = yw + yw;
+        float yz = quat.y() * quat.z(), dyz = yz + yz, xw = quat.x() * quat.w(), dxw = xw + xw;
         float rm00 = w2 + x2 - z2 - y2;
-        float rm01 = xy + zw + zw + xy;
-        float rm02 = xz - yw + xz - yw;
-        float rm10 = -zw + xy - zw + xy;
+        float rm01 = dxy + dzw;
+        float rm02 = dxz - dyw;
+        float rm10 = -dzw + dxy;
         float rm11 = y2 - z2 + w2 - x2;
-        float rm12 = yz + yz + xw + xw;
-        float rm20 = yw + xz + xz + yw;
-        float rm21 = yz + yz - xw - xw;
+        float rm12 = dyz + dxw;
+        float rm20 = dyw + dxz;
+        float rm21 = dyz - dxw;
         float rm22 = z2 - y2 - x2 + w2;
         float nm00 = m00 * rm00 + m10 * rm01 + m20 * rm02;
         float nm01 = m01 * rm00 + m11 * rm01 + m21 * rm02;
@@ -10456,24 +11034,19 @@ public class Matrix4f implements Externalizable, Matrix4fc {
      * @return dest
      */
     public Matrix4f rotateAffine(Quaternionfc quat, Matrix4f dest) {
-        float w2 = quat.w() * quat.w();
-        float x2 = quat.x() * quat.x();
-        float y2 = quat.y() * quat.y();
-        float z2 = quat.z() * quat.z();
-        float zw = quat.z() * quat.w();
-        float xy = quat.x() * quat.y();
-        float xz = quat.x() * quat.z();
-        float yw = quat.y() * quat.w();
-        float yz = quat.y() * quat.z();
-        float xw = quat.x() * quat.w();
+        float w2 = quat.w() * quat.w(), x2 = quat.x() * quat.x();
+        float y2 = quat.y() * quat.y(), z2 = quat.z() * quat.z();
+        float zw = quat.z() * quat.w(), dzw = zw + zw, xy = quat.x() * quat.y(), dxy = xy + xy;
+        float xz = quat.x() * quat.z(), dxz = xz + xz, yw = quat.y() * quat.w(), dyw = yw + yw;
+        float yz = quat.y() * quat.z(), dyz = yz + yz, xw = quat.x() * quat.w(), dxw = xw + xw;
         float rm00 = w2 + x2 - z2 - y2;
-        float rm01 = xy + zw + zw + xy;
-        float rm02 = xz - yw + xz - yw;
-        float rm10 = -zw + xy - zw + xy;
+        float rm01 = dxy + dzw;
+        float rm02 = dxz - dyw;
+        float rm10 = -dzw + dxy;
         float rm11 = y2 - z2 + w2 - x2;
-        float rm12 = yz + yz + xw + xw;
-        float rm20 = yw + xz + xz + yw;
-        float rm21 = yz + yz - xw - xw;
+        float rm12 = dyz + dxw;
+        float rm20 = dyw + dxz;
+        float rm21 = dyz - dxw;
         float rm22 = z2 - y2 - x2 + w2;
         float nm00 = m00 * rm00 + m10 * rm01 + m20 * rm02;
         float nm01 = m01 * rm00 + m11 * rm01 + m21 * rm02;
@@ -10560,42 +11133,31 @@ public class Matrix4f implements Externalizable, Matrix4fc {
      * @return dest
      */
     public Matrix4f rotateTranslation(Quaternionfc quat, Matrix4f dest) {
-        float w2 = quat.w() * quat.w();
-        float x2 = quat.x() * quat.x();
-        float y2 = quat.y() * quat.y();
-        float z2 = quat.z() * quat.z();
-        float zw = quat.z() * quat.w();
-        float xy = quat.x() * quat.y();
-        float xz = quat.x() * quat.z();
-        float yw = quat.y() * quat.w();
-        float yz = quat.y() * quat.z();
-        float xw = quat.x() * quat.w();
+        float w2 = quat.w() * quat.w(), x2 = quat.x() * quat.x();
+        float y2 = quat.y() * quat.y(), z2 = quat.z() * quat.z();
+        float zw = quat.z() * quat.w(), dzw = zw + zw, xy = quat.x() * quat.y(), dxy = xy + xy;
+        float xz = quat.x() * quat.z(), dxz = xz + xz, yw = quat.y() * quat.w(), dyw = yw + yw;
+        float yz = quat.y() * quat.z(), dyz = yz + yz, xw = quat.x() * quat.w(), dxw = xw + xw;
         float rm00 = w2 + x2 - z2 - y2;
-        float rm01 = xy + zw + zw + xy;
-        float rm02 = xz - yw + xz - yw;
-        float rm10 = -zw + xy - zw + xy;
+        float rm01 = dxy + dzw;
+        float rm02 = dxz - dyw;
+        float rm10 = -dzw + dxy;
         float rm11 = y2 - z2 + w2 - x2;
-        float rm12 = yz + yz + xw + xw;
-        float rm20 = yw + xz + xz + yw;
-        float rm21 = yz + yz - xw - xw;
+        float rm12 = dyz + dxw;
+        float rm20 = dyw + dxz;
+        float rm21 = dyz - dxw;
         float rm22 = z2 - y2 - x2 + w2;
-        float nm00 = rm00;
-        float nm01 = rm01;
-        float nm02 = rm02;
-        float nm10 = rm10;
-        float nm11 = rm11;
-        float nm12 = rm12;
         dest._m20(rm20);
         dest._m21(rm21);
         dest._m22(rm22);
         dest._m23(0.0f);
-        dest._m00(nm00);
-        dest._m01(nm01);
-        dest._m02(nm02);
+        dest._m00(rm00);
+        dest._m01(rm01);
+        dest._m02(rm02);
         dest._m03(0.0f);
-        dest._m10(nm10);
-        dest._m11(nm11);
-        dest._m12(nm12);
+        dest._m10(rm10);
+        dest._m11(rm11);
+        dest._m12(rm12);
         dest._m13(0.0f);
         dest._m30(m30);
         dest._m31(m31);
@@ -10637,27 +11199,76 @@ public class Matrix4f implements Externalizable, Matrix4fc {
     }
 
     /* (non-Javadoc)
+     * @see org.joml.Matrix4fc#rotateAroundAffine(org.joml.Quaternionfc, float, float, float, org.joml.Matrix4f)
+     */
+    public Matrix4f rotateAroundAffine(Quaternionfc quat, float ox, float oy, float oz, Matrix4f dest) {
+        float w2 = quat.w() * quat.w(), x2 = quat.x() * quat.x();
+        float y2 = quat.y() * quat.y(), z2 = quat.z() * quat.z();
+        float zw = quat.z() * quat.w(), dzw = zw + zw, xy = quat.x() * quat.y(), dxy = xy + xy;
+        float xz = quat.x() * quat.z(), dxz = xz + xz, yw = quat.y() * quat.w(), dyw = yw + yw;
+        float yz = quat.y() * quat.z(), dyz = yz + yz, xw = quat.x() * quat.w(), dxw = xw + xw;
+        float rm00 = w2 + x2 - z2 - y2;
+        float rm01 = dxy + dzw;
+        float rm02 = dxz - dyw;
+        float rm10 = -dzw + dxy;
+        float rm11 = y2 - z2 + w2 - x2;
+        float rm12 = dyz + dxw;
+        float rm20 = dyw + dxz;
+        float rm21 = dyz - dxw;
+        float rm22 = z2 - y2 - x2 + w2;
+        float tm30 = m00 * ox + m10 * oy + m20 * oz + m30;
+        float tm31 = m01 * ox + m11 * oy + m21 * oz + m31;
+        float tm32 = m02 * ox + m12 * oy + m22 * oz + m32;
+        float nm00 = m00 * rm00 + m10 * rm01 + m20 * rm02;
+        float nm01 = m01 * rm00 + m11 * rm01 + m21 * rm02;
+        float nm02 = m02 * rm00 + m12 * rm01 + m22 * rm02;
+        float nm10 = m00 * rm10 + m10 * rm11 + m20 * rm12;
+        float nm11 = m01 * rm10 + m11 * rm11 + m21 * rm12;
+        float nm12 = m02 * rm10 + m12 * rm11 + m22 * rm12;
+        dest._m20(m00 * rm20 + m10 * rm21 + m20 * rm22);
+        dest._m21(m01 * rm20 + m11 * rm21 + m21 * rm22);
+        dest._m22(m02 * rm20 + m12 * rm21 + m22 * rm22);
+        dest._m23(0.0f);
+        dest._m00(nm00);
+        dest._m01(nm01);
+        dest._m02(nm02);
+        dest._m03(0.0f);
+        dest._m10(nm10);
+        dest._m11(nm11);
+        dest._m12(nm12);
+        dest._m13(0.0f);
+        dest._m30(-nm00 * ox - nm10 * oy - m20 * oz + tm30);
+        dest._m31(-nm01 * ox - nm11 * oy - m21 * oz + tm31);
+        dest._m32(-nm02 * ox - nm12 * oy - m22 * oz + tm32);
+        dest._m33(1.0f);
+        dest._properties(properties & ~(PROPERTY_PERSPECTIVE | PROPERTY_IDENTITY | PROPERTY_TRANSLATION));
+        return dest;
+    }
+
+    /* (non-Javadoc)
      * @see org.joml.Matrix4fc#rotateAround(org.joml.Quaternionfc, float, float, float, org.joml.Matrix4f)
      */
     public Matrix4f rotateAround(Quaternionfc quat, float ox, float oy, float oz, Matrix4f dest) {
-        float w2 = quat.w() * quat.w();
-        float x2 = quat.x() * quat.x();
-        float y2 = quat.y() * quat.y();
-        float z2 = quat.z() * quat.z();
-        float zw = quat.z() * quat.w();
-        float xy = quat.x() * quat.y();
-        float xz = quat.x() * quat.z();
-        float yw = quat.y() * quat.w();
-        float yz = quat.y() * quat.z();
-        float xw = quat.x() * quat.w();
+        if ((properties & PROPERTY_IDENTITY) != 0)
+            return rotationAround(quat, ox, oy, oz);
+        else if ((properties & PROPERTY_AFFINE) != 0)
+            return rotateAroundAffine(quat, ox, oy, oz, dest);
+        return rotateAroundGeneric(quat, ox, oy, oz, dest);
+    }
+    private Matrix4f rotateAroundGeneric(Quaternionfc quat, float ox, float oy, float oz, Matrix4f dest) {
+        float w2 = quat.w() * quat.w(), x2 = quat.x() * quat.x();
+        float y2 = quat.y() * quat.y(), z2 = quat.z() * quat.z();
+        float zw = quat.z() * quat.w(), dzw = zw + zw, xy = quat.x() * quat.y(), dxy = xy + xy;
+        float xz = quat.x() * quat.z(), dxz = xz + xz, yw = quat.y() * quat.w(), dyw = yw + yw;
+        float yz = quat.y() * quat.z(), dyz = yz + yz, xw = quat.x() * quat.w(), dxw = xw + xw;
         float rm00 = w2 + x2 - z2 - y2;
-        float rm01 = xy + zw + zw + xy;
-        float rm02 = xz - yw + xz - yw;
-        float rm10 = -zw + xy - zw + xy;
+        float rm01 = dxy + dzw;
+        float rm02 = dxz - dyw;
+        float rm10 = -dzw + dxy;
         float rm11 = y2 - z2 + w2 - x2;
-        float rm12 = yz + yz + xw + xw;
-        float rm20 = yw + xz + xz + yw;
-        float rm21 = yz + yz - xw - xw;
+        float rm12 = dyz + dxw;
+        float rm20 = dyw + dxz;
+        float rm21 = dyz - dxw;
         float rm22 = z2 - y2 - x2 + w2;
         float tm30 = m00 * ox + m10 * oy + m20 * oz + m30;
         float tm31 = m01 * ox + m11 * oy + m21 * oz + m31;
@@ -10691,6 +11302,53 @@ public class Matrix4f implements Externalizable, Matrix4fc {
     }
 
     /**
+     * Set this matrix to a transformation composed of a rotation of the specified {@link Quaternionfc} while using <code>(ox, oy, oz)</code> as the rotation origin.
+     * <p>
+     * When used with a right-handed coordinate system, the produced rotation will rotate a vector 
+     * counter-clockwise around the rotation axis, when viewing along the negative axis direction towards the origin.
+     * When used with a left-handed coordinate system, the rotation is clockwise.
+     * <p>
+     * This method is equivalent to calling: <code>translation(ox, oy, oz).rotate(quat).translate(-ox, -oy, -oz)</code>
+     * <p>
+     * Reference: <a href="http://en.wikipedia.org/wiki/Rotation_matrix#Quaternion">http://en.wikipedia.org</a>
+     * 
+     * @param quat
+     *          the {@link Quaternionfc}
+     * @param ox
+     *          the x coordinate of the rotation origin
+     * @param oy
+     *          the y coordinate of the rotation origin
+     * @param oz
+     *          the z coordinate of the rotation origin
+     * @return this
+     */
+    public Matrix4f rotationAround(Quaternionfc quat, float ox, float oy, float oz) {
+        float w2 = quat.w() * quat.w(), x2 = quat.x() * quat.x();
+        float y2 = quat.y() * quat.y(), z2 = quat.z() * quat.z();
+        float zw = quat.z() * quat.w(), dzw = zw + zw, xy = quat.x() * quat.y(), dxy = xy + xy;
+        float xz = quat.x() * quat.z(), dxz = xz + xz, yw = quat.y() * quat.w(), dyw = yw + yw;
+        float yz = quat.y() * quat.z(), dyz = yz + yz, xw = quat.x() * quat.w(), dxw = xw + xw;
+        this._m20(dyw + dxz);
+        this._m21(dyz - dxw);
+        this._m22(z2 - y2 - x2 + w2);
+        this._m23(0.0f);
+        this._m00(w2 + x2 - z2 - y2);
+        this._m01(dxy + dzw);
+        this._m02(dxz - dyw);
+        this._m03(0.0f);
+        this._m10(-dzw + dxy);
+        this._m11(y2 - z2 + w2 - x2);
+        this._m12(dyz + dxw);
+        this._m13(0.0f);
+        this._m30(-m00 * ox - m10 * oy - m20 * oz + ox);
+        this._m31(-m01 * ox - m11 * oy - m21 * oz + oy);
+        this._m32(-m02 * ox - m12 * oy - m22 * oz + oz);
+        this._m33(1.0f);
+        this._properties(PROPERTY_AFFINE | PROPERTY_ORTHONORMAL);
+        return this;
+    }
+
+    /**
      * Pre-multiply the rotation transformation of the given {@link Quaternionfc} to this matrix and store
      * the result in <code>dest</code>.
      * <p>
@@ -10717,24 +11375,19 @@ public class Matrix4f implements Externalizable, Matrix4fc {
      * @return dest
      */
     public Matrix4f rotateLocal(Quaternionfc quat, Matrix4f dest) {
-        float w2 = quat.w() * quat.w();
-        float x2 = quat.x() * quat.x();
-        float y2 = quat.y() * quat.y();
-        float z2 = quat.z() * quat.z();
-        float zw = quat.z() * quat.w();
-        float xy = quat.x() * quat.y();
-        float xz = quat.x() * quat.z();
-        float yw = quat.y() * quat.w();
-        float yz = quat.y() * quat.z();
-        float xw = quat.x() * quat.w();
+        float w2 = quat.w() * quat.w(), x2 = quat.x() * quat.x();
+        float y2 = quat.y() * quat.y(), z2 = quat.z() * quat.z();
+        float zw = quat.z() * quat.w(), dzw = zw + zw, xy = quat.x() * quat.y(), dxy = xy + xy;
+        float xz = quat.x() * quat.z(), dxz = xz + xz, yw = quat.y() * quat.w(), dyw = yw + yw;
+        float yz = quat.y() * quat.z(), dyz = yz + yz, xw = quat.x() * quat.w(), dxw = xw + xw;
         float lm00 = w2 + x2 - z2 - y2;
-        float lm01 = xy + zw + zw + xy;
-        float lm02 = xz - yw + xz - yw;
-        float lm10 = -zw + xy - zw + xy;
+        float lm01 = dxy + dzw;
+        float lm02 = dxz - dyw;
+        float lm10 = -dzw + dxy;
         float lm11 = y2 - z2 + w2 - x2;
-        float lm12 = yz + yz + xw + xw;
-        float lm20 = yw + xz + xz + yw;
-        float lm21 = yz + yz - xw - xw;
+        float lm12 = dyz + dxw;
+        float lm20 = dyw + dxz;
+        float lm21 = dyz - dxw;
         float lm22 = z2 - y2 - x2 + w2;
         float nm00 = lm00 * m00 + lm10 * m01 + lm20 * m02;
         float nm01 = lm01 * m00 + lm11 * m01 + lm21 * m02;
@@ -13674,22 +14327,17 @@ public class Matrix4f implements Externalizable, Matrix4fc {
         float upnX = ndirY * leftZ - ndirZ * leftY;
         float upnY = ndirZ * leftX - ndirX * leftZ;
         float upnZ = ndirX * leftY - ndirY * leftX;
+        if ((properties & PROPERTY_IDENTITY) == 0)
+            MemUtil.INSTANCE.identity(this);
         this._m00(leftX);
         this._m01(leftY);
         this._m02(leftZ);
-        this._m03(0.0f);
         this._m10(upnX);
         this._m11(upnY);
         this._m12(upnZ);
-        this._m13(0.0f);
         this._m20(ndirX);
         this._m21(ndirY);
         this._m22(ndirZ);
-        this._m23(0.0f);
-        this._m30(0.0f);
-        this._m31(0.0f);
-        this._m32(0.0f);
-        this._m33(1.0f);
         _properties(PROPERTY_AFFINE | PROPERTY_ORTHONORMAL);
         return this;
     }

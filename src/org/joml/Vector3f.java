@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -1238,12 +1238,11 @@ public class Vector3f implements Externalizable, Vector3fc {
      * @see org.joml.Vector3fc#lengthSquared()
      */
     public float lengthSquared() {
-        return x * x + y * y + z * z;
+        return lengthSquared(x, y, z);
     }
 
     /**
      * Get the length squared of a 3-dimensional single-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -1266,7 +1265,6 @@ public class Vector3f implements Externalizable, Vector3fc {
 
     /**
      * Get the length of a 3-dimensional single-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -1277,7 +1275,7 @@ public class Vector3f implements Externalizable, Vector3fc {
      * @author F. Neurath
      */
     public static float length(float x, float y, float z) {
-        return (float) Math.sqrt(x * x + y * y + z * z);
+        return (float) Math.sqrt(lengthSquared(x, y, z));
     }
 
     /**
@@ -1408,6 +1406,51 @@ public class Vector3f implements Externalizable, Vector3fc {
         return dx * dx + dy * dy + dz * dz;
     }
 
+    /**
+     * Return the distance between <code>(x1, y1, z1)</code> and <code>(x2, y2, z2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @return the euclidean distance
+     */
+    public static float distance(float x1, float y1, float z1, float x2, float y2, float z2) {
+        return (float) Math.sqrt(distanceSquared(x1, y1, z1, x2, y2, z2));
+    }
+
+    /**
+     * Return the squared distance between <code>(x1, y1, z1)</code> and <code>(x2, y2, z2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @return the euclidean distance squared
+     */
+    public static float distanceSquared(float x1, float y1, float z1, float x2, float y2, float z2) {
+        float dx = x1 - x2;
+        float dy = y1 - y2;
+        float dz = z1 - z2;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
     /* (non-Javadoc)
      * @see org.joml.Vector3fc#dot(org.joml.Vector3fc)
      */
@@ -1426,10 +1469,10 @@ public class Vector3f implements Externalizable, Vector3fc {
      * @see org.joml.Vector3fc#angleCos(org.joml.Vector3fc)
      */
     public float angleCos(Vector3fc v) {
-        double length1Sqared = x * x + y * y + z * z;
-        double length2Sqared = v.x() * v.x() + v.y() * v.y() + v.z() * v.z();
+        double length1Squared = x * x + y * y + z * z;
+        double length2Squared = v.x() * v.x() + v.y() * v.y() + v.z() * v.z();
         double dot = x * v.x() + y * v.y() + z * v.z();
-        return (float) (dot / (Math.sqrt(length1Sqared * length2Sqared)));
+        return (float) (dot / (Math.sqrt(length1Squared * length2Squared)));
     }
 
     /* (non-Javadoc)
@@ -1600,6 +1643,19 @@ public class Vector3f implements Externalizable, Vector3fc {
         if (!Runtime.equals(y, v.y(), delta))
             return false;
         if (!Runtime.equals(z, v.z(), delta))
+            return false;
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector3fc#equals(float, float, float)
+     */
+    public boolean equals(float x, float y, float z) {
+        if (Float.floatToIntBits(this.x) != Float.floatToIntBits(x))
+            return false;
+        if (Float.floatToIntBits(this.y) != Float.floatToIntBits(y))
+            return false;
+        if (Float.floatToIntBits(this.z) != Float.floatToIntBits(z))
             return false;
         return true;
     }
@@ -1842,6 +1898,66 @@ public class Vector3f implements Externalizable, Vector3fc {
      */
     public Vector3f orthogonalizeUnit(Vector3fc v) {
         return orthogonalizeUnit(v, thisOrNew());
+    }
+
+    /**
+     * Set each component of this vector to the largest (closest to positive
+     * infinity) {@code float} value that is less than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector3f floor() {
+        return floor(thisOrNew());
+    }
+
+    public Vector3f floor(Vector3f dest) {
+        dest.x = Math.floor(x);
+        dest.y = Math.floor(y);
+        dest.z = Math.floor(z);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the smallest (closest to negative
+     * infinity) {@code float} value that is greater than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector3f ceil() {
+        return ceil(thisOrNew());
+    }
+
+    public Vector3f ceil(Vector3f dest) {
+        dest.x = Math.ceil(x);
+        dest.y = Math.ceil(y);
+        dest.z = Math.ceil(z);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the closest float that is equal to
+     * a mathematical integer, with ties rounding to positive infinity.
+     *
+     * @return a vector holding the result
+     */
+    public Vector3f round() {
+        return round(thisOrNew());
+    }
+
+    public Vector3f round(Vector3f dest) {
+        dest.x = Math.round(x);
+        dest.y = Math.round(y);
+        dest.z = Math.round(z);
+        return dest;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector3fc#isFinite()
+     */
+    public boolean isFinite() {
+        return Math.isFinite(x) && Math.isFinite(y) && Math.isFinite(z);
     }
 
 }

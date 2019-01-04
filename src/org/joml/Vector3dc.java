@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016-2018 JOML
+ * (C) Copyright 2016-2019 JOML
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -768,14 +768,14 @@ public interface Vector3dc {
 
     /**
      * Return the length squared of this vector.
-     * 
+     *
      * @return the length squared
      */
     double lengthSquared();
 
     /**
      * Return the length of this vector.
-     * 
+     *
      * @return the length
      */
     double length();
@@ -1113,6 +1113,51 @@ public interface Vector3dc {
     Vector3d orthogonalizeUnit(Vector3dc v, Vector3d dest);
 
     /**
+     * Compute for each component of this vector the largest (closest to positive
+     * infinity) {@code double} value that is less than or equal to that
+     * component and is equal to a mathematical integer and store the result in
+     * <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector3d floor(Vector3d dest);
+
+    /**
+     * Compute for each component of this vector the smallest (closest to negative
+     * infinity) {@code double} value that is greater than or equal to that
+     * component and is equal to a mathematical integer and store the result in
+     * <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector3d ceil(Vector3d dest);
+
+    /**
+     * Compute for each component of this vector the closest double that is equal to
+     * a mathematical integer, with ties rounding to positive infinity and store
+     * the result in <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector3d round(Vector3d dest);
+
+    /**
+     * Determine whether all components are finite floating-point values, that
+     * is, they are not {@link Double#isNaN() NaN} and not
+     * {@link Double#isInfinite() infinity}.
+     *
+     * @return {@code true} if all components are finite floating-point values;
+     *         {@code false} otherwise
+     */
+    boolean isFinite();
+
+    /**
      * Compare the vector components of <code>this</code> vector with the given vector using the given <code>delta</code>
      * and return whether all of them are equal within a maximum difference of <code>delta</code>.
      * <p>
@@ -1127,5 +1172,19 @@ public interface Vector3dc {
      * @return <code>true</code> whether all of the vector components are equal; <code>false</code> otherwise
      */
     boolean equals(Vector3dc v, double delta);
+
+    /**
+     * Compare the vector components of <code>this</code> vector with the given <code>(x, y, z)</code>
+     * and return whether all of them are equal.
+     *
+     * @param x
+     *          the x component to compare to
+     * @param y
+     *          the y component to compare to
+     * @param z
+     *          the z component to compare to
+     * @return <code>true</code> if all the vector components are equal
+     */
+    boolean equals(double x, double y, double z);
 
 }

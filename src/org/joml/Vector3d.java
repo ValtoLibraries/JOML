@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -1659,12 +1659,11 @@ public class Vector3d implements Externalizable, Vector3dc {
      * @see org.joml.Vector3dc#lengthSquared()
      */
     public double lengthSquared() {
-        return x * x + y * y + z * z;
+        return lengthSquared(x, y, z);
     }
 
     /**
      * Get the length squared of a 3-dimensional double-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -1674,7 +1673,7 @@ public class Vector3d implements Externalizable, Vector3dc {
      *
      * @author F. Neurath
      */
-    public static double lengthSqared(double x, double y, double z) {
+    public static double lengthSquared(double x, double y, double z) {
         return x * x + y * y + z * z;
     }
 
@@ -1687,7 +1686,6 @@ public class Vector3d implements Externalizable, Vector3dc {
 
     /**
      * Get the length of a 3-dimensional double-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -1698,7 +1696,7 @@ public class Vector3d implements Externalizable, Vector3dc {
      * @author F. Neurath
      */
     public static double length(double x, double y, double z) {
-        return Math.sqrt(x * x + y * y + z * z);
+        return Math.sqrt(lengthSquared(x, y, z));
     }
 
     /**
@@ -1806,10 +1804,7 @@ public class Vector3d implements Externalizable, Vector3dc {
      * @see org.joml.Vector3dc#distance(double, double, double)
      */
     public double distance(double x, double y, double z) {
-        double dx = this.x - x;
-        double dy = this.y - y;
-        double dz = this.z - z;
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        return Math.sqrt(distanceSquared(x, y, z));
     }
 
     /* (non-Javadoc)
@@ -1826,6 +1821,51 @@ public class Vector3d implements Externalizable, Vector3dc {
         double dx = this.x - x;
         double dy = this.y - y;
         double dz = this.z - z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    /**
+     * Return the distance between <code>(x1, y1, z1)</code> and <code>(x2, y2, z2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @return the euclidean distance
+     */
+    public static double distance(double x1, double y1, double z1, double x2, double y2, double z2) {
+        return Math.sqrt(distanceSquared(x1, y1, z1, x2, y2, z2));
+    }
+
+    /**
+     * Return the squared distance between <code>(x1, y1, z1)</code> and <code>(x2, y2, z2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @return the euclidean distance squared
+     */
+    public static double distanceSquared(double x1, double y1, double z1, double x2, double y2, double z2) {
+        double dx = x1 - x2;
+        double dy = y1 - y2;
+        double dz = z1 - z2;
         return dx * dx + dy * dy + dz * dz;
     }
 
@@ -1847,10 +1887,10 @@ public class Vector3d implements Externalizable, Vector3dc {
      * @see org.joml.Vector3dc#angleCos(org.joml.Vector3dc)
      */
     public double angleCos(Vector3dc v) {
-        double length1Sqared = x * x + y * y + z * z;
-        double length2Sqared = v.x() * v.x() + v.y() * v.y() + v.z() * v.z();
+        double length1Squared = x * x + y * y + z * z;
+        double length2Squared = v.x() * v.x() + v.y() * v.y() + v.z() * v.z();
         double dot = x * v.x() + y * v.y() + z * v.z();
-        return dot / (Math.sqrt(length1Sqared * length2Sqared));
+        return dot / (Math.sqrt(length1Squared * length2Squared));
     }
 
     /* (non-Javadoc)
@@ -2025,6 +2065,19 @@ public class Vector3d implements Externalizable, Vector3dc {
         if (!Runtime.equals(y, v.y(), delta))
             return false;
         if (!Runtime.equals(z, v.z(), delta))
+            return false;
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector3dc#equals(double, double, double)
+     */
+    public boolean equals(double x, double y, double z) {
+        if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(x))
+            return false;
+        if (Double.doubleToLongBits(this.y) != Double.doubleToLongBits(y))
+            return false;
+        if (Double.doubleToLongBits(this.z) != Double.doubleToLongBits(z))
             return false;
         return true;
     }
@@ -2267,6 +2320,66 @@ public class Vector3d implements Externalizable, Vector3dc {
      */
     public Vector3d orthogonalizeUnit(Vector3dc v) {
         return orthogonalizeUnit(v, thisOrNew());
+    }
+
+    /**
+     * Set each component of this vector to the largest (closest to positive
+     * infinity) {@code double} value that is less than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector3d floor() {
+        return floor(thisOrNew());
+    }
+
+    public Vector3d floor(Vector3d dest) {
+        dest.x = Math.floor(x);
+        dest.y = Math.floor(y);
+        dest.z = Math.floor(z);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the smallest (closest to negative
+     * infinity) {@code double} value that is greater than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector3d ceil() {
+        return ceil(thisOrNew());
+    }
+
+    public Vector3d ceil(Vector3d dest) {
+        dest.x = Math.ceil(x);
+        dest.y = Math.ceil(y);
+        dest.z = Math.ceil(z);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the closest double that is equal to
+     * a mathematical integer, with ties rounding to positive infinity.
+     *
+     * @return a vector holding the result
+     */
+    public Vector3d round() {
+        return round(thisOrNew());
+    }
+
+    public Vector3d round(Vector3d dest) {
+        dest.x = Math.round(x);
+        dest.y = Math.round(y);
+        dest.z = Math.round(z);
+        return dest;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector3dc#isFinite()
+     */
+    public boolean isFinite() {
+        return Math.isFinite(x) && Math.isFinite(y) && Math.isFinite(z);
     }
 
 }

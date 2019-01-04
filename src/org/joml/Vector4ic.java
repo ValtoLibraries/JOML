@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016-2018 JOML
+ * (C) Copyright 2016-2019 JOML
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -282,6 +282,32 @@ public interface Vector4ic {
     double distance(int x, int y, int z, int w);
 
     /**
+     * Return the grid distance in between (aka 1-Norm, Minkowski or Manhattan distance)
+     * <code>(x, y)</code>.
+     *
+     * @param v
+     *          the other vector
+     * @return the grid distance
+     */
+    long gridDistance(Vector4ic v);
+
+    /**
+     * Return the grid distance in between (aka 1-Norm, Minkowski or Manhattan distance)
+     * <code>(x, y)</code>.
+     *
+     * @param x
+     *          the x component of the other vector
+     * @param y
+     *          the y component of the other vector
+     * @param z
+     *          the z component of the other vector
+     * @param w
+     *          the w component of the other vector
+     * @return the grid distance
+     */
+    long gridDistance(int x, int y, int z, int w);
+
+    /**
      * Return the square of the distance between this vector and <code>v</code>.
      *
      * @param v
@@ -355,5 +381,35 @@ public interface Vector4ic {
      * @throws IllegalArgumentException if <code>component</code> is not within <code>[0..3]</code>
      */
     int get(int component) throws IllegalArgumentException;
+
+    /**
+     * Determine the component with the biggest absolute value.
+     * 
+     * @return the component index, within <code>[0..3]</code>
+     */
+    int maxComponent();
+
+    /**
+     * Determine the component with the smallest (towards zero) absolute value.
+     * 
+     * @return the component index, within <code>[0..3]</code>
+     */
+    int minComponent();
+
+    /**
+     * Compare the vector components of <code>this</code> vector with the given <code>(x, y, z, w)</code>
+     * and return whether all of them are equal.
+     *
+     * @param x
+     *          the x component to compare to
+     * @param y
+     *          the y component to compare to
+     * @param z
+     *          the z component to compare to
+     * @param w
+     *          the w component to compare to
+     * @return <code>true</code> if all the vector components are equal
+     */
+    boolean equals(int x, int y, int z, int w);
 
 }

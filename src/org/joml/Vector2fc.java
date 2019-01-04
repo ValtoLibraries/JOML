@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016-2018 JOML
+ * (C) Copyright 2016-2019 JOML
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -167,18 +167,18 @@ public interface Vector2fc {
     float angle(Vector2fc v);
 
     /**
+     * Return the length squared of this vector.
+     *
+     * @return the length squared
+     */
+    float lengthSquared();
+
+    /**
      * Return the length of this vector.
      * 
      * @return the length
      */
     float length();
-
-    /**
-     * Return the length squared of this vector.
-     * 
-     * @return the length squared
-     */
-    float lengthSquared();
 
     /**
      * Return the distance between this and <code>v</code>.
@@ -405,6 +405,20 @@ public interface Vector2fc {
     Vector2f max(Vector2fc v, Vector2f dest);
 
     /**
+     * Determine the component with the biggest absolute value.
+     * 
+     * @return the component index, within <code>[0..1]</code>
+     */
+    int maxComponent();
+
+    /**
+     * Determine the component with the smallest (towards zero) absolute value.
+     * 
+     * @return the component index, within <code>[0..1]</code>
+     */
+    int minComponent();
+
+    /**
      * Get the value of the specified component of this vector.
      * 
      * @param component
@@ -413,6 +427,51 @@ public interface Vector2fc {
      * @throws IllegalArgumentException if <code>component</code> is not within <code>[0..1]</code>
      */
     float get(int component) throws IllegalArgumentException;
+
+    /**
+     * Compute for each component of this vector the largest (closest to positive
+     * infinity) {@code float} value that is less than or equal to that
+     * component and is equal to a mathematical integer and store the result in
+     * <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector2f floor(Vector2f dest);
+
+    /**
+     * Compute for each component of this vector the smallest (closest to negative
+     * infinity) {@code float} value that is greater than or equal to that
+     * component and is equal to a mathematical integer and store the result in
+     * <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector2f ceil(Vector2f dest);
+
+    /**
+     * Compute for each component of this vector the closest float that is equal to
+     * a mathematical integer, with ties rounding to positive infinity and store
+     * the result in <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector2f round(Vector2f dest);
+
+    /**
+     * Determine whether all components are finite floating-point values, that
+     * is, they are not {@link Double#isNaN() NaN} and not
+     * {@link Double#isInfinite() infinity}.
+     *
+     * @return {@code true} if all components are finite floating-point values;
+     *         {@code false} otherwise
+     */
+    boolean isFinite();
 
     /**
      * Compare the vector components of <code>this</code> vector with the given vector using the given <code>delta</code>
@@ -429,5 +488,17 @@ public interface Vector2fc {
      * @return <code>true</code> whether all of the vector components are equal; <code>false</code> otherwise
      */
     boolean equals(Vector2fc v, float delta);
+
+    /**
+     * Compare the vector components of <code>this</code> vector with the given <code>(x, y)</code>
+     * and return whether all of them are equal.
+     *
+     * @param x
+     *          the x component to compare to
+     * @param y
+     *          the y component to compare to
+     * @return <code>true</code> if all the vector components are equal
+     */
+    boolean equals(float x, float y);
 
 }

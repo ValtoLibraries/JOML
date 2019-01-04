@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016-2018 JOML
+ * (C) Copyright 2016-2019 JOML
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -241,13 +241,6 @@ public interface Vector2dc {
     double angle(Vector2dc v);
 
     /**
-     * Return the length of this vector.
-     * 
-     * @return the length
-     */
-    double length();
-
-    /**
      * Return the length squared of this vector.
      *
      * @return the length squared
@@ -255,26 +248,51 @@ public interface Vector2dc {
     double lengthSquared();
 
     /**
-     * Return the distance between <code>this</code> and <code>v</code>.
+     * Return the length of this vector.
      * 
+     * @return the length
+     */
+    double length();
+
+    /**
+     * Return the distance between this and <code>v</code>.
+     *
      * @param v
-     *          the other vector
-     * @return the euclidean distance
+     *        the other vector
+     * @return the distance
      */
     double distance(Vector2dc v);
 
     /**
-     * Return the distance between <code>this</code> and <code>v</code>.
-     * 
+     * Return the distance squared between this and <code>v</code>.
+     *
      * @param v
-     *          the other vector
-     * @return the euclidean distance
+     *        the other vector
+     * @return the distance squared
+     */
+    double distanceSquared(Vector2dc v);
+
+    /**
+     * Return the distance between this and <code>v</code>.
+     *
+     * @param v
+     *        the other vector
+     * @return the distance
      */
     double distance(Vector2fc v);
 
     /**
+     * Return the distance squared between this and <code>v</code>.
+     *
+     * @param v
+     *        the other vector
+     * @return the distance squared
+     */
+    double distanceSquared(Vector2fc v);
+
+    /**
      * Return the distance between <code>this</code> vector and <code>(x, y)</code>.
-     * 
+     *
      * @param x
      *          the x component of the other vector
      * @param y
@@ -282,6 +300,17 @@ public interface Vector2dc {
      * @return the euclidean distance
      */
     double distance(double x, double y);
+
+    /**
+     * Return the distance squared between <code>this</code> vector and <code>(x, y)</code>.
+     *
+     * @param x
+     *          the x component of the other vector
+     * @param y
+     *          the y component of the other vector
+     * @return the euclidean distance squared
+     */
+    double distanceSquared(double x, double y);
 
     /**
      * Normalize this vector and store the result in <code>dest</code>.
@@ -415,6 +444,20 @@ public interface Vector2dc {
     Vector2d max(Vector2dc v, Vector2d dest);
 
     /**
+     * Determine the component with the biggest absolute value.
+     * 
+     * @return the component index, within <code>[0..1]</code>
+     */
+    int maxComponent();
+
+    /**
+     * Determine the component with the smallest (towards zero) absolute value.
+     * 
+     * @return the component index, within <code>[0..1]</code>
+     */
+    int minComponent();
+
+    /**
      * Get the value of the specified component of this vector.
      * 
      * @param component
@@ -423,6 +466,51 @@ public interface Vector2dc {
      * @throws IllegalArgumentException if <code>component</code> is not within <code>[0..1]</code>
      */
     double get(int component) throws IllegalArgumentException;
+
+    /**
+     * Compute for each component of this vector the largest (closest to positive
+     * infinity) {@code double} value that is less than or equal to that
+     * component and is equal to a mathematical integer and store the result in
+     * <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector2d floor(Vector2d dest);
+
+    /**
+     * Compute for each component of this vector the smallest (closest to negative
+     * infinity) {@code double} value that is greater than or equal to that
+     * component and is equal to a mathematical integer and store the result in
+     * <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector2d ceil(Vector2d dest);
+
+    /**
+     * Compute for each component of this vector the closest double that is equal to
+     * a mathematical integer, with ties rounding to positive infinity and store
+     * the result in <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector2d round(Vector2d dest);
+
+    /**
+     * Determine whether all components are finite floating-point values, that
+     * is, they are not {@link Double#isNaN() NaN} and not
+     * {@link Double#isInfinite() infinity}.
+     *
+     * @return {@code true} if all components are finite floating-point values;
+     *         {@code false} otherwise
+     */
+    boolean isFinite();
 
     /**
      * Compare the vector components of <code>this</code> vector with the given vector using the given <code>delta</code>
@@ -439,5 +527,17 @@ public interface Vector2dc {
      * @return <code>true</code> whether all of the vector components are equal; <code>false</code> otherwise
      */
     boolean equals(Vector2dc v, double delta);
+
+    /**
+     * Compare the vector components of <code>this</code> vector with the given <code>(x, y)</code>
+     * and return whether all of them are equal.
+     *
+     * @param x
+     *          the x component to compare to
+     * @param y
+     *          the y component to compare to
+     * @return <code>true</code> if all the vector components are equal
+     */
+    boolean equals(double x, double y);
 
 }

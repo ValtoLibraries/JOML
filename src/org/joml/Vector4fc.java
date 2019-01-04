@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016-2018 JOML
+ * (C) Copyright 2016-2019 JOML
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -448,17 +448,17 @@ public interface Vector4fc {
     Vector4f normalize(float length, Vector4f dest);
 
     /**
-     * Return the distance between <code>this</code> vector and <code>v</code>.
-     * 
+     * Return the distance between this Vector and <code>v</code>.
+     *
      * @param v
      *          the other vector
-     * @return the euclidean distance
+     * @return the distance
      */
     float distance(Vector4fc v);
 
     /**
      * Return the distance between <code>this</code> vector and <code>(x, y, z, w)</code>.
-     * 
+     *
      * @param x
      *          the x component of the other vector
      * @param y
@@ -470,6 +470,31 @@ public interface Vector4fc {
      * @return the euclidean distance
      */
     float distance(float x, float y, float z, float w);
+
+    /**
+     * Return the square of the distance between this vector and <code>v</code>.
+     *
+     * @param v
+     *          the other vector
+     * @return the squared of the distance
+     */
+    float distanceSquared(Vector4fc v);
+
+    /**
+     * Return the square of the distance between <code>this</code> vector and
+     * <code>(x, y, z, w)</code>.
+     *
+     * @param x
+     *          the x component of the other vector
+     * @param y
+     *          the y component of the other vector
+     * @param z
+     *          the z component of the other vector
+     * @param w
+     *          the w component of the other vector
+     * @return the square of the distance
+     */
+    float distanceSquared(float x, float y, float z, float w);
 
     /**
      * Compute the dot product (inner product) of this vector and <code>v</code>
@@ -612,6 +637,65 @@ public interface Vector4fc {
     float get(int component) throws IllegalArgumentException;
 
     /**
+     * Determine the component with the biggest absolute value.
+     * 
+     * @return the component index, within <code>[0..3]</code>
+     */
+    int maxComponent();
+
+    /**
+     * Determine the component with the smallest (towards zero) absolute value.
+     * 
+     * @return the component index, within <code>[0..3]</code>
+     */
+    int minComponent();
+
+    /**
+     * Compute for each component of this vector the largest (closest to positive
+     * infinity) {@code float} value that is less than or equal to that
+     * component and is equal to a mathematical integer and store the result in
+     * <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector4f floor(Vector4f dest);
+
+    /**
+     * Compute for each component of this vector the smallest (closest to negative
+     * infinity) {@code float} value that is greater than or equal to that
+     * component and is equal to a mathematical integer and store the result in
+     * <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector4f ceil(Vector4f dest);
+
+    /**
+     * Compute for each component of this vector the closest float that is equal to
+     * a mathematical integer, with ties rounding to positive infinity and store
+     * the result in <code>dest</code>.
+     *
+     * @param dest
+     *          will hold the result
+     * @return dest
+     */
+    Vector4f round(Vector4f dest);
+
+    /**
+     * Determine whether all components are finite floating-point values, that
+     * is, they are not {@link Double#isNaN() NaN} and not
+     * {@link Double#isInfinite() infinity}.
+     *
+     * @return {@code true} if all components are finite floating-point values;
+     *         {@code false} otherwise
+     */
+    boolean isFinite();
+
+    /**
      * Compare the vector components of <code>this</code> vector with the given vector using the given <code>delta</code>
      * and return whether all of them are equal within a maximum difference of <code>delta</code>.
      * <p>
@@ -626,5 +710,21 @@ public interface Vector4fc {
      * @return <code>true</code> whether all of the vector components are equal; <code>false</code> otherwise
      */
     boolean equals(Vector4fc v, float delta);
+
+    /**
+     * Compare the vector components of <code>this</code> vector with the given <code>(x, y, z, w)</code>
+     * and return whether all of them are equal.
+     *
+     * @param x
+     *          the x component to compare to
+     * @param y
+     *          the y component to compare to
+     * @param z
+     *          the z component to compare to
+     * @param w
+     *          the w component to compare to
+     * @return <code>true</code> if all the vector components are equal
+     */
+    boolean equals(float x, float y, float z, float w);
 
 }

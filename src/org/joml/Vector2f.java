@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.joml.Math;
 import org.joml.internal.MemUtil;
 import org.joml.internal.Options;
 import org.joml.internal.Runtime;
@@ -499,37 +500,14 @@ public class Vector2f implements Externalizable, Vector2fc {
     }
 
     /* (non-Javadoc)
-     * @see org.joml.Vector2fc#length()
-     */
-    public float length() {
-        return (float) Math.sqrt((x * x) + (y * y));
-    }
-
-    /**
-     * Get the length of a 2-dimensional single-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
-     *
-     * @param x The vector's x component
-     * @param y The vector's y component
-     *
-     * @return the length of the given vector
-     *
-     * @author F. Neurath
-     */
-    public static float length(float x, float y) {
-        return (float) Math.sqrt(x * x + y * y);
-    }
-
-    /* (non-Javadoc)
      * @see org.joml.Vector2fc#lengthSquared()
      */
     public float lengthSquared() {
-        return x * x + y * y;
+        return lengthSquared(x, y);
     }
 
     /**
      * Get the length squared of a 2-dimensional single-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -540,6 +518,27 @@ public class Vector2f implements Externalizable, Vector2fc {
      */
     public static float lengthSquared(float x, float y) {
         return x * x + y * y;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2fc#length()
+     */
+    public float length() {
+        return (float) Math.sqrt(lengthSquared());
+    }
+
+    /**
+     * Get the length of a 2-dimensional single-precision vector.
+     *
+     * @param x The vector's x component
+     * @param y The vector's y component
+     *
+     * @return the length of the given vector
+     *
+     * @author F. Neurath
+     */
+    public static float length(float x, float y) {
+        return (float) Math.sqrt(lengthSquared(x, y));
     }
 
     /* (non-Javadoc)
@@ -571,6 +570,42 @@ public class Vector2f implements Externalizable, Vector2fc {
     public float distanceSquared(float x, float y) {
         float dx = this.x - x;
         float dy = this.y - y;
+        return dx * dx + dy * dy;
+    }
+
+    /**
+     * Return the distance between <code>(x1, y1)</code> and <code>(x2, y2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @return the euclidean distance
+     */
+    public static float distance(float x1, float y1, float x2, float y2) {
+        return (float) Math.sqrt(distanceSquared(x1, y1, x2, y2));
+    }
+
+    /**
+     * Return the squared distance between <code>(x1, y1)</code> and <code>(x2, y2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @return the euclidean distance squared
+     */
+    public static float distanceSquared(float x1, float y1, float x2, float y2) {
+        float dx = x1 - x2;
+        float dy = y1 - y2;
         return dx * dx + dy * dy;
     }
 
@@ -863,6 +898,17 @@ public class Vector2f implements Externalizable, Vector2fc {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.joml.Vector2fc#equals(float, float)
+     */
+    public boolean equals(float x, float y) {
+        if (Float.floatToIntBits(this.x) != Float.floatToIntBits(x))
+            return false;
+        if (Float.floatToIntBits(this.y) != Float.floatToIntBits(y))
+            return false;
+        return true;
+    }
+
     /**
      * Return a string representation of this vector.
      * <p>
@@ -961,6 +1007,83 @@ public class Vector2f implements Externalizable, Vector2fc {
         dest.x = x > v.x() ? x : v.x();
         dest.y = y > v.y() ? y : v.y();
         return dest;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2fc#maxComponent()
+     */
+    public int maxComponent() {
+        float absX = Math.abs(x);
+        float absY = Math.abs(y);
+        if (absX >= absY)
+            return 0;
+        return 1;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2fc#minComponent()
+     */
+    public int minComponent() {
+        float absX = Math.abs(x);
+        float absY = Math.abs(y);
+        if (absX < absY)
+            return 0;
+        return 1;
+    }
+
+    /**
+     * Set each component of this vector to the largest (closest to positive
+     * infinity) {@code float} value that is less than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector2f floor() {
+        return floor(thisOrNew());
+    }
+
+    public Vector2f floor(Vector2f dest) {
+        dest.x = Math.floor(x);
+        dest.y = Math.floor(y);
+        return dest;
+    }
+
+    /**
+     * Ceil each component of this vector
+     *
+     * @return a vector holding the result
+     */
+    public Vector2f ceil() {
+        return ceil(thisOrNew());
+    }
+
+    public Vector2f ceil(Vector2f dest) {
+        dest.x = Math.ceil(x);
+        dest.y = Math.ceil(y);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the closest float that is equal to
+     * a mathematical integer, with ties rounding to positive infinity.
+     *
+     * @return a vector holding the result
+     */
+    public Vector2f round() {
+        return ceil(thisOrNew());
+    }
+
+    public Vector2f round(Vector2f dest) {
+        dest.x = Math.round(x);
+        dest.y = Math.round(y);
+        return dest;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector2fc#isFinite()
+     */
+    public boolean isFinite() {
+        return Math.isFinite(x) && Math.isFinite(y);
     }
 
 }

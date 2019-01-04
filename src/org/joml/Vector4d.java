@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import java.nio.DoubleBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.joml.Math;
 import org.joml.internal.MemUtil;
 import org.joml.internal.Options;
 import org.joml.internal.Runtime;
@@ -729,18 +730,18 @@ public class Vector4d implements Externalizable, Vector4dc {
     }
 
     public Vector4d add(Vector4dc v, Vector4d dest) {
-        dest.x = this.x + x;
-        dest.y = this.y + y;
-        dest.z = this.z + z;
-        dest.w = this.w + w;
+        dest.x = x + v.x();
+        dest.y = y + v.y();
+        dest.z = z + v.z();
+        dest.w = w + v.w();
         return dest;
     }
 
     public Vector4d add(Vector4fc v, Vector4d dest) {
-        dest.x = this.x + x;
-        dest.y = this.y + y;
-        dest.z = this.z + z;
-        dest.w = this.w + w;
+        dest.x = x + v.x();
+        dest.y = y + v.y();
+        dest.z = z + v.z();
+        dest.w = w + v.w();
         return dest;
     }
 
@@ -748,13 +749,13 @@ public class Vector4d implements Externalizable, Vector4dc {
      * Add <code>(x, y, z, w)</code> to this.
      * 
      * @param x
-     *          the x component to subtract
+     *          the x component to add
      * @param y
-     *          the y component to subtract
+     *          the y component to add
      * @param z
-     *          the z component to subtract
+     *          the z component to add
      * @param w
-     *          the w component to subtract
+     *          the w component to add
      * @return a vector holding the result
      */
     public Vector4d add(double x, double y, double z, double w) {
@@ -765,10 +766,10 @@ public class Vector4d implements Externalizable, Vector4dc {
      * @see org.joml.Vector4dc#add(double, double, double, double, org.joml.Vector4d)
      */
     public Vector4d add(double x, double y, double z, double w, Vector4d dest) {
-        dest.x = this.x - x;
-        dest.y = this.y - y;
-        dest.z = this.z - z;
-        dest.w = this.w - w;
+        dest.x = this.x + x;
+        dest.y = this.y + y;
+        dest.z = this.z + z;
+        dest.w = this.w + w;
         return dest;
     }
 
@@ -1243,12 +1244,11 @@ public class Vector4d implements Externalizable, Vector4dc {
      * @see org.joml.Vector4dc#lengthSquared()
      */
     public double lengthSquared() {
-        return x * x + y * y + z * z + w * w;
+        return lengthSquared(x, y, z, w);
     }
 
     /**
      * Get the length squared of a 4-dimensional double-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -1272,7 +1272,6 @@ public class Vector4d implements Externalizable, Vector4dc {
 
     /**
      * Get the length of a 4-dimensional double-precision vector.
-     * Addresses <a href="https://github.com/JOML-CI/JOML/issues/131">Issue #131</a>
      *
      * @param x The vector's x component
      * @param y The vector's y component
@@ -1284,7 +1283,7 @@ public class Vector4d implements Externalizable, Vector4dc {
      * @author F. Neurath
      */
     public static double length(double x, double y, double z, double w) {
-        return Math.sqrt(x * x + y * y + z * z + w * w);
+        return Math.sqrt(lengthSquared(x, y, z, w));
     }
 
     /**
@@ -1356,18 +1355,86 @@ public class Vector4d implements Externalizable, Vector4dc {
      * @see org.joml.Vector4dc#distance(org.joml.Vector4dc)
      */
     public double distance(Vector4dc v) {
-    	return distance(v.x(), v.y(), v.z(), v.w());
+        return distance(v.x(), v.y(), v.z(), v.w());
     }
 
     /* (non-Javadoc)
      * @see org.joml.Vector4dc#distance(double, double, double, double)
      */
     public double distance(double x, double y, double z, double w) {
+        return (float) Math.sqrt(distanceSquared(x, y, z, w));
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4dc#distanceSquared(org.joml.Vector4dc)
+     */
+    public double distanceSquared(Vector4dc v) {
+        return distanceSquared(v.x(), v.y(), v.z(), v.w());
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4dc#distanceSquared(double, double, double, double)
+     */
+    public double distanceSquared(double x, double y, double z, double w) {
         double dx = this.x - x;
         double dy = this.y - y;
         double dz = this.z - z;
         double dw = this.w - w;
-        return Math.sqrt(dx * dx + dy * dy + dz * dz + dw * dw);
+        return dx * dx + dy * dy + dz * dz + dw * dw;
+    }
+
+    /**
+     * Return the distance between <code>(x1, y1, z1, w1)</code> and <code>(x2, y2, z2, w2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param w1
+     *          the w component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @param w2
+     *          the 2 component of the second vector
+     * @return the euclidean distance
+     */
+    public static double distance(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2) {
+        return Math.sqrt(distanceSquared(x1, y1, z1, w1, x2, y2, z2, w2));
+    }
+
+    /**
+     * Return the squared distance between <code>(x1, y1, z1, w1)</code> and <code>(x2, y2, z2, w2)</code>.
+     *
+     * @param x1
+     *          the x component of the first vector
+     * @param y1
+     *          the y component of the first vector
+     * @param z1
+     *          the z component of the first vector
+     * @param w1
+     *          the w component of the first vector
+     * @param x2
+     *          the x component of the second vector
+     * @param y2
+     *          the y component of the second vector
+     * @param z2
+     *          the z component of the second vector
+     * @param w2
+     *          the w component of the second vector
+     * @return the euclidean distance squared
+     */
+    public static double distanceSquared(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2) {
+        double dx = x1 - x2;
+        double dy = y1 - y2;
+        double dz = z1 - z2;
+        double dw = w1 - w2;
+        return dx * dx + dy * dy + dz * dz + dw * dw;
     }
 
     /* (non-Javadoc)
@@ -1388,10 +1455,10 @@ public class Vector4d implements Externalizable, Vector4dc {
      * @see org.joml.Vector4dc#angleCos(org.joml.Vector4dc)
      */
     public double angleCos(Vector4dc v) {
-        double length1Sqared = x * x + y * y + z * z + w * w;
-        double length2Sqared = v.x() * v.x() + v.y() * v.y() + v.z() * v.z() + v.w() * v.w();
+        double length1Squared = x * x + y * y + z * z + w * w;
+        double length2Squared = v.x() * v.x() + v.y() * v.y() + v.z() * v.z() + v.w() * v.w();
         double dot = x * v.x() + y * v.y() + z * v.z() + w * v.w();
-        return dot / (Math.sqrt(length1Sqared * length2Sqared));
+        return dot / (Math.sqrt(length1Squared * length2Squared));
     }
 
     /* (non-Javadoc)
@@ -1562,6 +1629,21 @@ public class Vector4d implements Externalizable, Vector4dc {
     }
 
     /* (non-Javadoc)
+     * @see org.joml.Vector4dc#equals(double, double, double, double)
+     */
+    public boolean equals(double x, double y, double z, double w) {
+        if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(x))
+            return false;
+        if (Double.doubleToLongBits(this.y) != Double.doubleToLongBits(y))
+            return false;
+        if (Double.doubleToLongBits(this.z) != Double.doubleToLongBits(z))
+            return false;
+        if (Double.doubleToLongBits(this.w) != Double.doubleToLongBits(w))
+            return false;
+        return true;
+    }
+
+    /* (non-Javadoc)
      * @see org.joml.Vector4dc#smoothStep(org.joml.Vector4dc, double, org.joml.Vector4d)
      */
     public Vector4d smoothStep(Vector4dc v, double t, Vector4d dest) {
@@ -1633,4 +1715,102 @@ public class Vector4d implements Externalizable, Vector4dc {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.joml.Vector4dc#maxComponent()
+     */
+    public int maxComponent() {
+        double absX = Math.abs(x);
+        double absY = Math.abs(y);
+        double absZ = Math.abs(z);
+        double absW = Math.abs(w);
+        if (absX >= absY && absX >= absZ && absX >= absW) {
+            return 0;
+        } else if (absY >= absZ && absY >= absW) {
+            return 1;
+        } else if (absZ >= absW) {
+            return 2;
+        }
+        return 3;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4dc#minComponent()
+     */
+    public int minComponent() {
+        double absX = Math.abs(x);
+        double absY = Math.abs(y);
+        double absZ = Math.abs(z);
+        double absW = Math.abs(w);
+        if (absX < absY && absX < absZ && absX < absW) {
+            return 0;
+        } else if (absY < absZ && absY < absW) {
+            return 1;
+        } else if (absZ < absW) {
+            return 2;
+        }
+        return 3;
+    }
+
+    /**
+     * Set each component of this vector to the largest (closest to positive
+     * infinity) {@code double} value that is less than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector4d floor() {
+        return floor(thisOrNew());
+    }
+
+    public Vector4d floor(Vector4d dest) {
+        dest.x = Math.floor(x);
+        dest.y = Math.floor(y);
+        dest.z = Math.floor(z);
+        dest.w = Math.floor(w);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the smallest (closest to negative
+     * infinity) {@code double} value that is greater than or equal to that
+     * component and is equal to a mathematical integer.
+     *
+     * @return a vector holding the result
+     */
+    public Vector4d ceil() {
+        return ceil(thisOrNew());
+    }
+
+    public Vector4d ceil(Vector4d dest) {
+        dest.x = Math.ceil(x);
+        dest.y = Math.ceil(y);
+        dest.z = Math.ceil(z);
+        dest.w = Math.ceil(w);
+        return dest;
+    }
+
+    /**
+     * Set each component of this vector to the closest double that is equal to
+     * a mathematical integer, with ties rounding to positive infinity.
+     *
+     * @return a vector holding the result
+     */
+    public Vector4d round() {
+        return round(thisOrNew());
+    }
+
+    public Vector4d round(Vector4d dest) {
+        dest.x = Math.round(x);
+        dest.y = Math.round(y);
+        dest.z = Math.round(z);
+        dest.w = Math.round(w);
+        return dest;
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Vector4dc#isFinite()
+     */
+    public boolean isFinite() {
+        return Math.isFinite(x) && Math.isFinite(y) && Math.isFinite(z) && Math.isFinite(w);
+    }
 }

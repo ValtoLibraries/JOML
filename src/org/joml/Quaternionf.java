@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015-2018 Richard Greenlees
+ * (C) Copyright 2015-2019 Richard Greenlees
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -1274,20 +1274,20 @@ public class Quaternionf implements Externalizable, Quaternionfc {
         float x2 = this.x * this.x;
         float y2 = this.y * this.y;
         float z2 = this.z * this.z;
-        float zw = this.z * this.w;
-        float xy = this.x * this.y;
-        float xz = this.x * this.z;
-        float yw = this.y * this.w;
-        float yz = this.y * this.z;
-        float xw = this.x * this.w;
+        float zw = this.z * this.w, zwd = zw + zw;
+        float xy = this.x * this.y, xyd = xy + xy;
+        float xz = this.x * this.z, xzd = xz + xz;
+        float yw = this.y * this.w, ywd = yw + yw;
+        float yz = this.y * this.z, yzd = yz + yz;
+        float xw = this.x * this.w, xwd = xw + xw;
         float m00 = w2 + x2 - z2 - y2;
-        float m01 = xy + zw + zw + xy;
-        float m02 = xz - yw + xz - yw;
-        float m10 = -zw + xy - zw + xy;
+        float m01 = xyd + zwd;
+        float m02 = xzd - ywd;
+        float m10 = xyd - zwd;
         float m11 = y2 - z2 + w2 - x2;
-        float m12 = yz + yz + xw + xw;
-        float m20 = yw + xz + xz + yw;
-        float m21 = yz + yz - xw - xw;
+        float m12 = yzd + xwd;
+        float m20 = ywd + xzd;
+        float m21 = yzd - xwd;
         float m22 = z2 - y2 - x2 + w2;
         dest.x = m00 * x + m10 * y + m20 * z;
         dest.y = m01 * x + m11 * y + m21 * z;
@@ -1303,20 +1303,20 @@ public class Quaternionf implements Externalizable, Quaternionfc {
         float x2 = this.x * this.x;
         float y2 = this.y * this.y;
         float z2 = this.z * this.z;
-        float zw = this.z * this.w;
-        float xy = this.x * this.y;
-        float xz = this.x * this.z;
-        float yw = this.y * this.w;
-        float yz = this.y * this.z;
-        float xw = this.x * this.w;
+        float zw = this.z * this.w, zwd = zw + zw;
+        float xy = this.x * this.y, xyd = xy + xy;
+        float xz = this.x * this.z, xzd = xz + xz;
+        float yw = this.y * this.w, ywd = yw + yw;
+        float yz = this.y * this.z, yzd = yz + yz;
+        float xw = this.x * this.w, xwd = xw + xw;
         float m00 = w2 + x2 - z2 - y2;
-        float m01 = xy + zw + zw + xy;
-        float m02 = xz - yw + xz - yw;
-        float m10 = -zw + xy - zw + xy;
+        float m01 = xyd + zwd;
+        float m02 = xzd - ywd;
+        float m10 = xyd - zwd;
         float m11 = y2 - z2 + w2 - x2;
-        float m12 = yz + yz + xw + xw;
-        float m20 = yw + xz + xz + yw;
-        float m21 = yz + yz - xw - xw;
+        float m12 = yzd + xwd;
+        float m20 = ywd + xzd;
+        float m21 = yzd - xwd;
         float m22 = z2 - y2 - x2 + w2;
         dest.x = m00 * x + m10 * y + m20 * z;
         dest.y = m01 * x + m11 * y + m21 * z;
@@ -1339,20 +1339,20 @@ public class Quaternionf implements Externalizable, Quaternionfc {
         float x2 = this.x * this.x;
         float y2 = this.y * this.y;
         float z2 = this.z * this.z;
-        float zw = this.z * this.w;
-        float xy = this.x * this.y;
-        float xz = this.x * this.z;
-        float yw = this.y * this.w;
-        float yz = this.y * this.z;
-        float xw = this.x * this.w;
+        float zw = this.z * this.w, zwd = zw + zw;
+        float xy = this.x * this.y, xyd = xy + xy;
+        float xz = this.x * this.z, xzd = xz + xz;
+        float yw = this.y * this.w, ywd = yw + yw;
+        float yz = this.y * this.z, yzd = yz + yz;
+        float xw = this.x * this.w, xwd = xw + xw;
         float m00 = w2 + x2 - z2 - y2;
-        float m01 = xy + zw + zw + xy;
-        float m02 = xz - yw + xz - yw;
-        float m10 = -zw + xy - zw + xy;
+        float m01 = xyd + zwd;
+        float m02 = xzd - ywd;
+        float m10 = xyd - zwd;
         float m11 = y2 - z2 + w2 - x2;
-        float m12 = yz + yz + xw + xw;
-        float m20 = yw + xz + xz + yw;
-        float m21 = yz + yz - xw - xw;
+        float m12 = yzd + xwd;
+        float m20 = ywd + xzd;
+        float m21 = yzd - xwd;
         float m22 = z2 - y2 - x2 + w2;
         dest.x = m00 * x + m10 * y + m20 * z;
         dest.y = m01 * x + m11 * y + m21 * z;
@@ -1864,9 +1864,9 @@ public class Quaternionf implements Externalizable, Quaternionfc {
      * @see org.joml.Quaternionfc#integrate(float, float, float, float, org.joml.Quaternionf)
      */
     public Quaternionf integrate(float dt, float vx, float vy, float vz, Quaternionf dest) {
-        float thetaX = vx * 0.5f;
-        float thetaY = vy * 0.5f;
-        float thetaZ = vz * 0.5f;
+        float thetaX = dt * vx * 0.5f;
+        float thetaY = dt * vy * 0.5f;
+        float thetaZ = dt * vz * 0.5f;
         float thetaMagSq = thetaX * thetaX + thetaY * thetaY + thetaZ * thetaZ;
         float s;
         float dqX, dqY, dqZ, dqW;
