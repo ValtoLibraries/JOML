@@ -1,24 +1,25 @@
 /*
- * (C) Copyright 2015-2019 Richard Greenlees
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-
+ * The MIT License
+ *
+ * Copyright (c) 2015-2019 Richard Greenlees
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package org.joml;
 
@@ -66,6 +67,21 @@ public class Matrix3f implements Externalizable, Matrix3fc {
         m00 = 1.0f;
         m11 = 1.0f;
         m22 = 1.0f;
+    }
+
+    /**
+     * Create a new {@link Matrix3f} by setting its uppper left 2x2 submatrix to the values of the given {@link Matrix2fc}
+     * and the rest to identity.
+     *
+     * @param mat
+     *          the {@link Matrix2fc}
+     */
+    public Matrix3f(Matrix2fc mat) {
+        if (mat instanceof Matrix2f) {
+            MemUtil.INSTANCE.copy((Matrix2f) mat, this);
+        } else {
+            setMatrix2fc(mat);
+        }
     }
 
     /**
@@ -497,6 +513,36 @@ public class Matrix3f implements Externalizable, Matrix3fc {
         m20 = mat.m20();
         m21 = mat.m21();
         m22 = mat.m22();
+    }
+
+    /**
+     * Set the upper left 2x2 submatrix of this {@link Matrix3f} to the given {@link Matrix2fc}
+     * and the rest to identity.
+     *
+     * @see #Matrix3f(Matrix2fc)
+     *
+     * @param mat
+     *          the {@link Matrix2fc}
+     * @return this
+     */
+    public Matrix3f set(Matrix2fc mat) {
+        if (mat instanceof Matrix2f) {
+            MemUtil.INSTANCE.copy((Matrix2f) mat, this);
+        } else {
+            setMatrix2fc(mat);
+        }
+        return this;
+    }
+    private void setMatrix2fc(Matrix2fc mat) {
+        m00 = mat.m00();
+        m01 = mat.m01();
+        m02 = 0.0f;
+        m10 = mat.m10();
+        m11 = mat.m11();
+        m12 = 0.0f;
+        m20 = 0.0f;
+        m21 = 0.0f;
+        m22 = 1.0f;
     }
 
     /**
@@ -1049,7 +1095,7 @@ public class Matrix3f implements Externalizable, Matrix3fc {
     }
 //#endif
 
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     public Matrix3fc getToAddress(long address) {
         if (Options.NO_UNSAFE)
             throw new UnsupportedOperationException("Not supported when using joml.nounsafe");
@@ -1109,8 +1155,7 @@ public class Matrix3f implements Externalizable, Matrix3fc {
         return this;
     }
 //#endif
-
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     /**
      * Set the values of this matrix by reading 9 float values from off-heap memory in column-major order,
      * starting at the given address.
@@ -3266,17 +3311,17 @@ public class Matrix3f implements Externalizable, Matrix3fc {
         switch (row) {
         case 0:
             this.m00 = x;
-            this.m01 = y;
-            this.m02 = z;
+            this.m10 = y;
+            this.m20 = z;
             break;
         case 1:
-            this.m10 = x;
+            this.m01 = x;
             this.m11 = y;
-            this.m12 = z;
+            this.m21 = z;
             break;
         case 2:
-            this.m20 = x;
-            this.m21 = y;
+            this.m02 = x;
+            this.m12 = y;
             this.m22 = z;
             break;
         default:

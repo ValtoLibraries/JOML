@@ -1,24 +1,25 @@
 /*
- * (C) Copyright 2016-2019 JOML
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-
+ * The MIT License
+ *
+ * Copyright (c) 2016-2019 JOML
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package org.joml;
 
@@ -1159,7 +1160,7 @@ public interface Matrix4fc {
     ByteBuffer get4x3Transposed(int index, ByteBuffer buffer);
 //#endif
 
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     /**
      * Store this matrix in column-major order at the given off-heap address.
      * <p>
@@ -1542,6 +1543,25 @@ public interface Matrix4fc {
      * @return dest
      */
     Matrix4f scale(float xyz, Matrix4f dest);
+
+    /**
+     * Apply scaling to this matrix by by scaling the X axis by <code>x</code> and the Y axis by <code>y</code>
+     * and store the result in <code>dest</code>.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>S</code> the scaling matrix,
+     * then the new matrix will be <code>M * S</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * S * v</code>, the
+     * scaling will be applied first!
+     * 
+     * @param x
+     *            the factor of the x component
+     * @param y
+     *            the factor of the y component
+     * @param dest
+     *            will hold the result
+     * @return dest
+     */
+    Matrix4f scaleXY(float x, float y, Matrix4f dest);
 
     /**
      * Apply scaling to <code>this</code> matrix by scaling the base axes by the given x,
@@ -4971,6 +4991,50 @@ public interface Matrix4fc {
      * @return dest
      */
     Matrix4f obliqueZ(float a, float b, Matrix4f dest);
+
+    /**
+     * Apply a transformation to this matrix to ensure that the local Y axis (as obtained by {@link #positiveY(Vector3f)})
+     * will be coplanar to the plane spanned by the local Z axis (as obtained by {@link #positiveZ(Vector3f)}) and the
+     * given vector <code>up</code>, and store the result in <code>dest</code>.
+     * 
+     * This effectively ensure that the resulting matrix will be equal to the one obtained from calling
+     * {@link Matrix4f#setLookAt(Vector3fc, Vector3fc, Vector3fc)} with the current 
+     * local origin of this matrix (as obtained by {@link #originAffine(Vector3f)}), the sum of this position and the 
+     * negated local Z axis as well as the given vector <code>up</code>.
+     * 
+     * This method must only be called on {@link #isAffine()} matrices.
+     * 
+     * @param up
+     *            the up vector
+     * @param dest
+     *            will hold the result
+     * @return this
+     */
+    Matrix4f withLookAtUp(Vector3fc up, Matrix4f dest);
+
+    /**
+     * Apply a transformation to this matrix to ensure that the local Y axis (as obtained by {@link #positiveY(Vector3f)})
+     * will be coplanar to the plane spanned by the local Z axis (as obtained by {@link #positiveZ(Vector3f)}) and the
+     * given vector <code>(upX, upY, upZ)</code>, and store the result in <code>dest</code>.
+     * 
+     * This effectively ensure that the resulting matrix will be equal to the one obtained from calling
+     * {@link Matrix4f#setLookAt(float, float, float, float, float, float, float, float, float)} called with the current 
+     * local origin of this matrix (as obtained by {@link #originAffine(Vector3f)}), the sum of this position and the 
+     * negated local Z axis as well as the given vector <code>(upX, upY, upZ)</code>.
+     * 
+     * This method must only be called on {@link #isAffine()} matrices.
+     * 
+     * @param upX
+     *            the x coordinate of the up vector
+     * @param upY
+     *            the y coordinate of the up vector
+     * @param upZ
+     *            the z coordinate of the up vector
+     * @param dest
+     *            will hold the result
+     * @return this
+     */
+    Matrix4f withLookAtUp(float upX, float upY, float upZ, Matrix4f dest);
 
     /**
      * Compare the matrix elements of <code>this</code> matrix with the given matrix using the given <code>delta</code>

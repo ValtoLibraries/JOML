@@ -1,24 +1,25 @@
 /*
- * (C) Copyright 2015-2019 Richard Greenlees
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-
+ * The MIT License
+ *
+ * Copyright (c) 2015-2019 Richard Greenlees
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package org.joml;
 
@@ -62,6 +63,40 @@ public class Matrix3d implements Externalizable, Matrix3dc {
     public Matrix3d() {
         m00 = 1.0;
         m11 = 1.0;
+        m22 = 1.0;
+    }
+
+    /**
+     * Create a new {@link Matrix3d} by setting its uppper left 2x2 submatrix to the values of the given {@link Matrix2dc}
+     * and the rest to identity.
+     *
+     * @param mat
+     *          the {@link Matrix2dc}
+     */
+    public Matrix3d(Matrix2dc mat) {
+        if (mat instanceof Matrix2d) {
+            MemUtil.INSTANCE.copy((Matrix2d) mat, this);
+        } else {
+            setMatrix2dc(mat);
+        }
+    }
+
+    /**
+     * Create a new {@link Matrix3d} by setting its uppper left 2x2 submatrix to the values of the given {@link Matrix2fc}
+     * and the rest to identity.
+     *
+     * @param mat
+     *          the {@link Matrix2fc}
+     */
+    public Matrix3d(Matrix2fc mat) {
+        m00 = mat.m00();
+        m01 = mat.m01();
+        m02 = 0.0;
+        m10 = mat.m10();
+        m11 = mat.m11();
+        m12 = 0.0;
+        m20 = 0.0;
+        m21 = 0.0;
         m22 = 1.0;
     }
 
@@ -565,6 +600,59 @@ public class Matrix3d implements Externalizable, Matrix3dc {
         m21 = mat.m21();
         m22 = mat.m22();
         return this;
+    }
+
+    /**
+     * Set the upper left 2x2 submatrix of this {@link Matrix3d} to the given {@link Matrix2fc}
+     * and the rest to identity.
+     *
+     * @see #Matrix3d(Matrix2fc)
+     *
+     * @param mat
+     *          the {@link Matrix2fc}
+     * @return this
+     */
+    public Matrix3d set(Matrix2fc mat) {
+        m00 = mat.m00();
+        m01 = mat.m01();
+        m02 = 0.0;
+        m10 = mat.m10();
+        m11 = mat.m11();
+        m12 = 0.0;
+        m20 = 0.0;
+        m21 = 0.0;
+        m22 = 1.0;
+        return this;
+    }
+
+    /**
+     * Set the upper left 2x2 submatrix of this {@link Matrix3d} to the given {@link Matrix2dc}
+     * and the rest to identity.
+     *
+     * @see #Matrix3d(Matrix2dc)
+     *
+     * @param mat
+     *          the {@link Matrix2dc}
+     * @return this
+     */
+    public Matrix3d set(Matrix2dc mat) {
+        if (mat instanceof Matrix2d) {
+            MemUtil.INSTANCE.copy((Matrix2d) mat, this);
+        } else {
+            setMatrix2dc(mat);
+        }
+        return this;
+    }
+    private void setMatrix2dc(Matrix2dc mat) {
+        m00 = mat.m00();
+        m01 = mat.m01();
+        m02 = 0.0;
+        m10 = mat.m10();
+        m11 = mat.m11();
+        m12 = 0.0;
+        m20 = 0.0;
+        m21 = 0.0;
+        m22 = 1.0;
     }
 
     /**
@@ -1106,7 +1194,7 @@ public class Matrix3d implements Externalizable, Matrix3dc {
     }
 //#endif
 
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     public Matrix3dc getToAddress(long address) {
         if (Options.NO_UNSAFE)
             throw new UnsupportedOperationException("Not supported when using joml.nounsafe");
@@ -1215,6 +1303,24 @@ public class Matrix3d implements Externalizable, Matrix3dc {
     }
 
     /**
+     * Set the values of this matrix by reading 9 float values from the given {@link ByteBuffer} in column-major order,
+     * starting at its current position.
+     * <p>
+     * The ByteBuffer is expected to contain the values in column-major order.
+     * <p>
+     * The position of the ByteBuffer will not be changed by this method.
+     * 
+     * @param buffer
+     *              the ByteBuffer to read the matrix values from in column-major order
+     * @return this
+     */
+    public Matrix3d setFloats(ByteBuffer buffer) {
+        MemUtil.INSTANCE.getf(this, buffer.position(), buffer);
+        return this;
+    }
+//#endif
+//#ifdef __HAS_UNSAFE__
+    /**
      * Set the values of this matrix by reading 9 double values from off-heap memory in column-major order,
      * starting at the given address.
      * <p>
@@ -1231,23 +1337,6 @@ public class Matrix3d implements Externalizable, Matrix3dc {
             throw new UnsupportedOperationException("Not supported when using joml.nounsafe");
         MemUtil.MemUtilUnsafe unsafe = (MemUtil.MemUtilUnsafe) MemUtil.INSTANCE;
         unsafe.get(this, address);
-        return this;
-    }
-
-    /**
-     * Set the values of this matrix by reading 9 float values from the given {@link ByteBuffer} in column-major order,
-     * starting at its current position.
-     * <p>
-     * The ByteBuffer is expected to contain the values in column-major order.
-     * <p>
-     * The position of the ByteBuffer will not be changed by this method.
-     * 
-     * @param buffer
-     *              the ByteBuffer to read the matrix values from in column-major order
-     * @return this
-     */
-    public Matrix3d setFloats(ByteBuffer buffer) {
-        MemUtil.INSTANCE.getf(this, buffer.position(), buffer);
         return this;
     }
 //#endif
@@ -3530,17 +3619,17 @@ public class Matrix3d implements Externalizable, Matrix3dc {
         switch (row) {
         case 0:
             this.m00 = x;
-            this.m01 = y;
-            this.m02 = z;
+            this.m10 = y;
+            this.m20 = z;
             break;
         case 1:
-            this.m10 = x;
+            this.m01 = x;
             this.m11 = y;
-            this.m12 = z;
+            this.m21 = z;
             break;
         case 2:
-            this.m20 = x;
-            this.m21 = y;
+            this.m02 = x;
+            this.m12 = y;
             this.m22 = z;
             break;
         default:

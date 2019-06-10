@@ -1,24 +1,25 @@
 /*
- * (C) Copyright 2015-2019 Richard Greenlees
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-
+ * The MIT License
+ *
+ * Copyright (c) 2015-2019 Richard Greenlees
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package org.joml;
 
@@ -2252,7 +2253,7 @@ public class Matrix4f implements Externalizable, Matrix4fc {
     }
 //#endif
 
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     /**
      * Set the values of this matrix by reading 16 float values from off-heap memory in column-major order,
      * starting at the given address.
@@ -3279,8 +3280,7 @@ public class Matrix4f implements Externalizable, Matrix4fc {
         return buffer;
     }
 //#endif
-
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     public Matrix4fc getToAddress(long address) {
         if (Options.NO_UNSAFE)
             throw new UnsupportedOperationException("Not supported when using joml.nounsafe");
@@ -4703,6 +4703,31 @@ public class Matrix4f implements Externalizable, Matrix4fc {
      */
     public Matrix4f scale(float xyz) {
         return scale(xyz, xyz, xyz);
+    }
+
+    /* (non-Javadoc)
+     * @see org.joml.Matrix4fc#scaleXY(float, float, org.joml.Matrix4f)
+     */
+    public Matrix4f scaleXY(float x, float y, Matrix4f dest) {
+        return scale(x, y, 1.0f, dest);
+    }
+
+    /**
+     * Apply scaling to this matrix by scaling the X axis by <code>x</code> and the Y axis by <code>y</code>.
+     * <p>
+     * If <code>M</code> is <code>this</code> matrix and <code>S</code> the scaling matrix,
+     * then the new matrix will be <code>M * S</code>. So when transforming a
+     * vector <code>v</code> with the new matrix by using <code>M * S * v</code>, the
+     * scaling will be applied first!
+     * 
+     * @param x
+     *            the factor of the x component
+     * @param y
+     *            the factor of the y component
+     * @return this
+     */
+    public Matrix4f scaleXY(float x, float y) {
+        return scale(x, y, 1.0f);
     }
 
     /* (non-Javadoc)
@@ -14718,6 +14743,83 @@ public class Matrix4f implements Externalizable, Matrix4fc {
             far = near + nearFarDist;
         }
         projDest.setFrustum(px, px + tx, py, py + ty, near, far, zeroToOne);
+    }
+
+    /**
+     * Apply a transformation to this matrix to ensure that the local Y axis (as obtained by {@link #positiveY(Vector3f)})
+     * will be coplanar to the plane spanned by the local Z axis (as obtained by {@link #positiveZ(Vector3f)}) and the
+     * given vector <code>up</code>.
+     * 
+     * This effectively ensure that the resulting matrix will be equal to the one obtained from 
+     * {@link #setLookAt(Vector3fc, Vector3fc, Vector3fc)} called with the current 
+     * local origin of this matrix (as obtained by {@link #originAffine(Vector3f)}), the sum of this position and the 
+     * negated local Z axis as well as the given vector <code>up</code>.
+     * 
+     * This method must only be called on {@link #isAffine()} matrices.
+     * 
+     * @param up
+     *            the up vector
+     * @return this
+     */
+    public Matrix4f withLookAtUp(Vector3fc up) {
+        return withLookAtUp(up.x(), up.y(), up.z(), this);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.joml.Matrix4fc#withLookAtUp(Vector3fc, org.joml.Matrix4f)
+     */
+    public Matrix4f withLookAtUp(Vector3fc up, Matrix4f dest) {
+        return withLookAtUp(up.x(), up.y(), up.z());
+    }
+
+    /**
+     * Apply a transformation to this matrix to ensure that the local Y axis (as obtained by {@link #positiveY(Vector3f)})
+     * will be coplanar to the plane spanned by the local Z axis (as obtained by {@link #positiveZ(Vector3f)}) and the
+     * given vector <code>(upX, upY, upZ)</code>.
+     * 
+     * This effectively ensure that the resulting matrix will be equal to the one obtained from 
+     * {@link #setLookAt(float, float, float, float, float, float, float, float, float)} called with the current 
+     * local origin of this matrix (as obtained by {@link #originAffine(Vector3f)}), the sum of this position and the 
+     * negated local Z axis as well as the given vector <code>(upX, upY, upZ)</code>.
+     * 
+     * This method must only be called on {@link #isAffine()} matrices.
+     * 
+     * @param upX
+     *            the x coordinate of the up vector
+     * @param upY
+     *            the y coordinate of the up vector
+     * @param upZ
+     *            the z coordinate of the up vector
+     * @return this
+     */
+    public Matrix4f withLookAtUp(float upX, float upY, float upZ) {
+        return withLookAtUp(upX, upY, upZ, this);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.joml.Matrix4fc#withLookAtUp(float, float, float, org.joml.Matrix4f)
+     */
+    public Matrix4f withLookAtUp(float upX, float upY, float upZ, Matrix4f dest) {
+        float y = (upY * m21 - upZ * m11) * m02 +
+                  (upZ * m01 - upX * m21) * m12 +
+                  (upX * m11 - upY * m01) * m22;
+        float x = upX * m01 + upY * m11 + upZ * m21;
+        if ((properties & PROPERTY_ORTHONORMAL) == 0)
+            x *= (float) Math.sqrt(m01 * m01 + m11 * m11 + m21 * m21);
+        float invsqrt = 1.0f / (float) Math.sqrt(y * y + x * x);
+        float c = x * invsqrt, s = y * invsqrt;
+        float nm00 = c * m00 - s * m01, nm10 = c * m10 - s * m11, nm20 = c * m20 - s * m21, nm31 = s * m30 + c * m31;
+        float nm01 = s * m00 + c * m01, nm11 = s * m10 + c * m11, nm21 = s * m20 + c * m21, nm30 = c * m30 - s * m31;
+        dest._m00(nm00)._m10(nm10)._m20(nm20)._m30(nm30);
+        dest._m01(nm01)._m11(nm11)._m21(nm21)._m31(nm31);
+        if (dest != this) {
+            dest._m02(m02)._m12(m12)._m22(m22)._m32(m32);
+            dest._m03(m03)._m13(m13)._m23(m23)._m33(m33);
+        }
+        dest._properties(properties & ~(PROPERTY_PERSPECTIVE | PROPERTY_IDENTITY | PROPERTY_TRANSLATION));
+        return dest;
     }
 
 }

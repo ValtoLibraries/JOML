@@ -1,24 +1,25 @@
 /*
- * (C) Copyright 2017-2019 JOML
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-
+ * The MIT License
+ *
+ * Copyright (c) 2017-2019 JOML
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package org.joml;
 
@@ -76,6 +77,21 @@ public class Matrix3x2f implements Matrix3x2fc, Externalizable {
             MemUtil.INSTANCE.copy((Matrix3x2f) mat, this);
         } else {
             setMatrix3x2fc(mat);
+        }
+    }
+
+    /**
+     * Create a new {@link Matrix3x2f} by setting its left 2x2 submatrix to the values of the given {@link Matrix2fc}
+     * and the rest to identity.
+     *
+     * @param mat
+     *          the {@link Matrix2fc}
+     */
+    public Matrix3x2f(Matrix2fc mat) {
+        if (mat instanceof Matrix2f) {
+            MemUtil.INSTANCE.copy((Matrix2f) mat, this);
+        } else {
+            setMatrix2fc(mat);
         }
     }
 
@@ -250,6 +266,28 @@ public class Matrix3x2f implements Matrix3x2fc, Externalizable {
         m11 = mat.m11();
         m20 = mat.m20();
         m21 = mat.m21();
+    }
+
+    /**
+     * Set the left 2x2 submatrix of this {@link Matrix3x2f} to the given {@link Matrix2fc} and don't change the other elements.
+     *
+     * @param m
+     *          the 2x2 matrix
+     * @return this
+     */
+    public Matrix3x2f set(Matrix2fc m) {
+        if (m instanceof Matrix2f) {
+            MemUtil.INSTANCE.copy((Matrix2f) m, this);
+        } else {
+            setMatrix2fc(m);
+        }
+        return this;
+    }
+    private void setMatrix2fc(Matrix2fc mat) {
+        m00 = mat.m00();
+        m01 = mat.m01();
+        m10 = mat.m10();
+        m11 = mat.m11();
     }
 
     /**
@@ -1027,8 +1065,7 @@ public class Matrix3x2f implements Matrix3x2fc, Externalizable {
         return buffer;
     }
 //#endif
-
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     public Matrix3x2fc getToAddress(long address) {
         if (Options.NO_UNSAFE)
             throw new UnsupportedOperationException("Not supported when using joml.nounsafe");
@@ -1163,7 +1200,7 @@ public class Matrix3x2f implements Matrix3x2fc, Externalizable {
     }
 //#endif
 
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     /**
      * Set the values of this matrix by reading 6 float values from off-heap memory in column-major order,
      * starting at the given address.

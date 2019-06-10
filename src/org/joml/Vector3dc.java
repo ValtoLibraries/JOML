@@ -1,24 +1,25 @@
 /*
- * (C) Copyright 2016-2019 JOML
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-
+ * The MIT License
+ *
+ * Copyright (c) 2016-2019 JOML
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package org.joml;
 
@@ -114,7 +115,7 @@ public interface Vector3dc {
     DoubleBuffer get(int index, DoubleBuffer buffer);
 //#endif
 
-//#ifndef __GWT__
+//#ifdef __HAS_UNSAFE__
     /**
      * Store this vector at the given off-heap memory address.
      * <p>
@@ -914,6 +915,40 @@ public interface Vector3dc {
      * @return the angle, in radians
      */
     double angle(Vector3dc v);
+
+    /**
+     * Return the signed angle between this vector and the supplied vector with
+     * respect to the plane with the given normal vector <code>n</code>.
+     * 
+     * @see #angleCos(Vector3dc)
+     * 
+     * @param v
+     *          the other vector
+     * @param n
+     *          the plane's normal vector
+     * @return the angle, in radians
+     */
+    double angleSigned(Vector3dc v, Vector3dc n);
+
+    /**
+     * Return the signed angle between this vector and the supplied vector with
+     * respect to the plane with the given normal vector <code>(nx, ny, nz)</code>.
+     * 
+     * @param x
+     *          the x coordinate of the other vector
+     * @param y
+     *          the y coordinate of the other vector
+     * @param z
+     *          the z coordinate of the other vector
+     * @param nx
+     *          the x coordinate of the plane's normal vector
+     * @param ny
+     *          the y coordinate of the plane's normal vector
+     * @param nz
+     *          the z coordinate of the plane's normal vector
+     * @return the angle, in radians
+     */
+    double angleSigned(double x, double y, double z, double nx, double ny, double nz);
 
     /**
      * Set the components of <code>dest</code> to be the component-wise minimum of this and the other vector.
